@@ -71,8 +71,8 @@ const UserDashboard = () => {
                     {/*  */}
                     <div className='intro text-light'>
                         <ul className='flex flex-col gap-2'>
-                            <li className='font-bold'>Hi, {user.name ? user.name : ""} !</li>
-                            <li className='text-primary'>
+                            <li className='font-bold text-white'>Hi, {user.name ? user.name : ""} !</li>
+                            <li className='text-primary text-white'>
                                 Loged In : {user.email ? user.email.userEmail : ""}
                             </li>
                             <li>
@@ -81,10 +81,10 @@ const UserDashboard = () => {
                         </ul>
 
                         <ul className='actions mt-10 flex flex-col gap-10'>
-                            <li id='profile-btn' onClick={handleMenuSelection} className='shadow outline outline-1 p-4 rounded bg-primary font-bold cursor-pointer'>
+                            <li id='profile-btn' onClick={handleMenuSelection} className='shadow outline outline-1 p-4 rounded bg-primary font-bold cursor-pointer text-white'>
                                 My Profile
                             </li>
-                            <li id='job-tracker-btn' onClick={handleMenuSelection} className='shadow outline outline-1 p-4 rounded bg-primary font-bold cursor-pointer'>
+                            <li id='job-tracker-btn' onClick={handleMenuSelection} className='shadow outline outline-1 p-4 rounded bg-primary font-bold cursor-pointer text-white'>
                                 Job Application Tracker
                             </li>
                         </ul>
