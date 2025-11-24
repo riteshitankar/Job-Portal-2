@@ -311,4 +311,36 @@ const fetchProfile = async (req, res) => {
     }
 }
 
-export { test, handleUserRegister, handleOTPVerification, handleUserLogin, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile }
+
+// server/controller/userController.js
+let updateUserBio = async (req, res) => {
+    try {
+        let { bio } = req.body;
+
+        // ReactQuill sends "<p><br></p>" when empty → treat as empty
+        if (!bio || bio === "<p><br></p>" || bio.trim() === "" || bio.replace(/<[^>]*>/g, "").trim() === "") {
+            return res.status(400).json({ message: "Bio cannot be empty!" });
+        }
+
+        const userId = req.user._id;
+        const updatedUser = await userModel.findByIdAndUpdate(
+            userId,
+            { bio },  // ← Save HTML (it's safe if you trust user input)
+            { new: true }
+        );
+
+        return res.status(200).json({
+            message: "Bio updated successfully!",
+            bio: updatedUser.bio
+        });
+
+    } catch (err) {
+        console.log("Error updating bio:", err);
+        return res.status(400).json({ message: "Unable to update bio!" });
+    }
+};
+
+
+
+
+export { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile }

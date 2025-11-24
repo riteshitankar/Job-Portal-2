@@ -100,6 +100,20 @@ export const requestUserEmailOtpVerificationPasswordReset = async (data) => {
 
 
 
+// src/api/userAPI.js
+export const updateUserBio = async (token, bio) => {
+    return axios.patch(
+        `${import.meta.env.VITE_BASE_API_URL}/user/update-bio`,  // ← MUST HAVE /user
+        { bio },
+        {
+            headers: {
+                authorization: token,   // ← NOT "Authorization" or "Bearer"
+                "Content-Type": "application/json"
+            }
+        }
+    );
+};
+
 
 
 

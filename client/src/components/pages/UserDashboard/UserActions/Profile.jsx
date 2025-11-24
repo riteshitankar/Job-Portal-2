@@ -10,6 +10,8 @@ import { IoMdMail } from "react-icons/io";
 // for bio 
 import { SiStartpage } from "react-icons/si";
 import { MdEdit } from "react-icons/md";
+import { IoColorPaletteSharp } from "react-icons/io5";
+
 
 
 
@@ -23,7 +25,8 @@ import { useNavigate } from 'react-router-dom';
 import {
     userProfilePicture,
     requestOTPForPasswordReset,
-    requestUserEmailOtpVerificationPasswordReset
+    requestUserEmailOtpVerificationPasswordReset,
+    updateUserBio
 } from '../../../../api/userAPI';
 
 // dependency
@@ -50,7 +53,8 @@ const Profile = () => {
 
     // bio pop up
     const [showBioPopup, setShowBioPopup] = useState(false);
-    const [value,setValue] = useState('');
+    const [showBioPopup2, setShowBioPopup2] = useState(false);
+    const [value, setValue] = useState('');
     const handleDrop = (e) => {
         e.preventDefault();
         const file = e.dataTransfer.files[0];
@@ -61,6 +65,9 @@ const Profile = () => {
             triggerMessage("warning", "invalid/missing file !");
         }
     };
+
+    const [color, setColor] = useState("#ffffff");
+
 
     const handleDragOver = (e) => {
         e.preventDefault();
@@ -100,8 +107,9 @@ const Profile = () => {
 
     return (
         <>
-            <div id='user-profile' className='shadow'>
-                <div className='bg-black'></div>
+            <div id='user-profile' className='shadow '>
+                <div style={{ backgroundColor: color }} className='border border-1'>
+                </div>
                 <div className='information'>
                     <div className='pnpa'>
                         <div className='profile-picture'>
@@ -121,8 +129,8 @@ const Profile = () => {
                                             <button
                                                 onClick={() => setTriggerProfilePictureChange(true)}
                                                 className='bg-primary px-2 py-1 bg-white rounded hover:bg-yellow-800 z-10'
-                                                style={{ cursor: 'pointer', display: showPasswordReset || showBioPopup?'none':'block' }}
-                                                // fine
+                                                style={{ cursor: 'pointer', display: showPasswordReset || showBioPopup ? 'none' : 'block' }}
+                                            // fine
                                             >
                                                 <FaCamera />
                                             </button>
@@ -150,7 +158,7 @@ const Profile = () => {
                                         >
                                             <FaTimes />
                                         </button>
-                                        <div className='content flex justify-center items-center p-52' style={{backgroundColor:'yellow'}}>
+                                        <div className='content flex justify-center items-center p-52' style={{ backgroundColor: 'yellow' }}>
                                             <div
                                                 className='grow upload-area bg border border-dashed border-dark p-5 rounded' onDrop={handleDrop} onDragOver={handleDragOver}
                                             >
@@ -195,7 +203,7 @@ const Profile = () => {
                             )}
                         </div>
 
-                        <div className='user-info-container p-5 flex flex-col gap-3'>
+                        <div className='user-info-container p-3 flex flex-col gap-3'>
                             <div className='flex gap-3 p-3 shadow'>
                                 <div className='flex items-center gap-3'>
                                     <span className='user-info-icon'>
@@ -210,24 +218,44 @@ const Profile = () => {
                                     <span>{user.logedIn ? user.phone : null}</span>
                                 </div>
                             </div>
-                            <div className='flex gap-3 p-3 shadow'>
-                                <div className='flex items-center gap-3'>
-                                    <span className='user-info-icon'>
-                                       <SiStartpage />
+                            <div className="flex gap-3 p-3 shadow">
+                                <div className="flex items-center gap-3">
+                                    <span className="user-info-icon">
+                                        <IoColorPaletteSharp />
                                     </span>
-                                    
-                                    <span>{user.logedIn ? user.bio : null}</span>
+                                    <span>Choose a cover color : </span>
+                                    <span>
+                                        <input type="color" onChange={(e) => setColor(e.target.value)} className='h-10 w-10' />
 
-                                    <span style={{display:user.bio?'none':'block'}}>
-                                        <button className='hover:cursor-pointer border-none p-2 rounded italic bg-blue-200 hover:bg-blue-700 hover:text-white'
-                                        onClick={() => setShowBioPopup(true)}
-                                        >Click here to add your bio</button>
                                     </span>
-                                    <span style={{display:user.bio?'block':'none'}}>
-                                        <MdEdit />
-                                    </span>
+                                </div>
+                            </div>
 
-                                    
+                            <div className='flex gap-3 p-3 shadow '>
+                                <div className='flex items-start gap-3 justify-between'>
+                                    <div className='user-info-icon'><SiStartpage /></div>
+
+                                    <div className="flex-1">
+                                        {user.bio ? (
+                                            <div
+                                                className="prose prose-sm max-w-none"
+                                                dangerouslySetInnerHTML={{ __html: user.bio }}
+                                            />
+                                        ) : (
+                                            <span className="italic">[You don't have bio]</span>
+                                        )}
+                                    </div>
+
+
+                                    <button
+                                        onClick={() => {
+                                            setValue(user.bio || "");
+                                            setShowBioPopup(true);
+                                        }}
+                                        className="text-blue-600 p-1 transition hover:cursor-pointer hover:bg-black border rounded-full"
+                                    >
+                                        {user.bio ? <MdEdit size={22} /> : "Add Bio"}
+                                    </button>
                                 </div>
                             </div>
                             <div className='p-3 shadow'>
@@ -253,7 +281,7 @@ const Profile = () => {
                             </div>
                         </div>
 
-                        
+
 
 
 
@@ -294,28 +322,58 @@ const Profile = () => {
                 </div>
             </div>
 
+            {/* SINGLE BIO POPUP - WORKING 100% */}
             {showBioPopup && (
-                <div className='fixed inset-0 bg-black  z-50 flex items-center justify-center p-4'>
-                    <div className='bg-white rounded-lg  relative' style={{ width: '100vw', height: '500px' }}>
+                <div className='fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4'>
+                    <div className='bg-white rounded-lg shadow-2xl relative' style={{ width: '100vw', height: 'auto' }}>
                         <button
                             onClick={() => setShowBioPopup(false)}
-                            className='absolute top-4 right-4 text-gray-600 hover:text-red-600 z-10'
+                            className='absolute top-4 right-4 text-gray-600 hover:text-red-600 z-10 bg-white rounded-full p-2 shadow'
                         >
-                            <FaTimes size={28} />
+                            <FaTimes size={24} />
                         </button>
-                        <div className='p-10 h-full flex flex-col items-center justify-center text-center'>
-                            <h2 className='text-2xl font-bold mb-6'>Add Your Bio</h2>
-                            
-                            <ReactQuill theme='snow' className='w-full' value={value} onChange={setValue}/>
 
-                            <button className='mt-6 bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 hover:cursor-pointer'>
-                                Save Bio
-                            </button>
+                        <div className='p-8 h-full flex flex-col'>
+                            <h2 className='text-2xl font-bold mb-6 text-center'>Edit Your Bio</h2>
+
+                            <div className="flex-1 mb-6">
+                                <ReactQuill
+                                    theme="snow"
+                                    value={value}
+                                    onChange={setValue}
+                                    className="h-full"
+                                    style={{ height: 'calc(100% - 50px)' }}
+                                />
+                            </div>
+
+                            <div className="flex justify-center gap-4">
+
+                                <button
+                                    onClick={async () => {
+                                        const textOnly = value.replace(/<[^>]*>/g, "").trim();
+                                        if (textOnly.length < 10) {
+                                            triggerMessage("warning", "Bio must be at least 10 characters!");
+                                            return;
+                                        }
+
+                                        try {
+                                            await updateUserBio(localStorage.getItem("token"), value);
+                                            triggerMessage("success", "Bio updated successfully!");
+                                            setShowBioPopup(false);
+                                            fetchUserProfile();
+                                        } catch (err) {
+                                            triggerMessage("danger", "Failed to save bio");
+                                        }
+                                    }}
+                                    className='px-8 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700'
+                                >
+                                    Save Bio
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
-
 
 
             {showPasswordReset && (
@@ -369,8 +427,8 @@ const Profile = () => {
                                 <div>
                                     <label className='block text-sm font-medium mb-3'>Enter OTP</label>
                                     <OtpInput value={resetOtp} onChange={setResetOtp} numInputs={4} renderInput={(props) => (
-                                            <input {...props} className='h-16 text-2xl text-center border-2 border-gray-300 rounded-lg mx-2 focus:border-primary ' style={{width:'50px'}} />
-                                        )}
+                                        <input {...props} className='h-16 text-2xl text-center border-2 border-gray-300 rounded-lg mx-2 focus:border-primary ' style={{ width: '50px' }} />
+                                    )}
                                     />
                                 </div>
 
