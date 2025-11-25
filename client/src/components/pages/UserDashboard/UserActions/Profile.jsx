@@ -12,9 +12,6 @@ import { SiStartpage } from "react-icons/si";
 import { MdEdit } from "react-icons/md";
 import { IoColorPaletteSharp } from "react-icons/io5";
 
-
-
-
 // context
 import { useUser } from '../../../../context/userContext';
 import { useMessage } from '../../../../context/messageContext';
@@ -26,7 +23,9 @@ import {
     userProfilePicture,
     requestOTPForPasswordReset,
     requestUserEmailOtpVerificationPasswordReset,
-    updateUserBio
+    updateUserBio,
+    uploadUserResume,
+    deleteUserResume
 } from '../../../../api/userAPI';
 
 // dependency
@@ -40,9 +39,12 @@ const Profile = () => {
     // top navigate user on home page
     let navigate = useNavigate();
 
+    // for profile picture 
     let [triggerProfilePictureChange, setTriggerProfilePictureChange] = useState(false);
     let [selectedImage, setSelectedImage] = useState(null);
     let [previewUrl, setPreviewUrl] = useState(null);
+    // for resume 
+    let [TriggerResumeSection, setTriggerResumeSection] = useState(false);
 
     // password reset status
     const [showPasswordReset, setShowPasswordReset] = useState(false);
@@ -110,7 +112,7 @@ const Profile = () => {
             <div id='user-profile' className='shadow '>
                 <div style={{ backgroundColor: color }} className='border border-1'>
                 </div>
-                <div className='information'>
+                <div className='information bg-blue-400'>
                     <div className='pnpa'>
                         <div className='profile-picture'>
                             {
@@ -129,7 +131,7 @@ const Profile = () => {
                                             <button
                                                 onClick={() => setTriggerProfilePictureChange(true)}
                                                 className='bg-primary px-2 py-1 bg-white rounded hover:bg-yellow-800 z-10'
-                                                style={{ cursor: 'pointer', display: showPasswordReset || showBioPopup ? 'none' : 'block' }}
+                                                style={{ cursor: 'pointer', display: showPasswordReset || showBioPopup || TriggerResumeSection ? 'none' : 'block' }}
                                             // fine
                                             >
                                                 <FaCamera />
@@ -233,7 +235,7 @@ const Profile = () => {
 
                             <div className='flex gap-3 p-3 shadow '>
                                 <div className='flex items-start gap-3 justify-between'>
-                                    <div className='user-info-icon'><SiStartpage /></div>
+                                    <div className='user-info-icon p-1 mt-2'><SiStartpage /></div>
 
                                     <div className="flex-1">
                                         {user.bio ? (
@@ -252,7 +254,7 @@ const Profile = () => {
                                             setValue(user.bio || "");
                                             setShowBioPopup(true);
                                         }}
-                                        className="text-blue-600 p-1 transition hover:cursor-pointer hover:bg-black border rounded-full"
+                                        className="text-blue-600 p-1 transition hover:cursor-pointer hover:bg-black border rounded-full mt-2"
                                     >
                                         {user.bio ? <MdEdit size={22} /> : "Add Bio"}
                                     </button>
@@ -298,10 +300,10 @@ const Profile = () => {
                             </button>
 
                             <button
-                                onClick={() => setTriggerEditForm(true)}
+                                onClick={() => setTriggerResumeSection(true)}
                                 className='bg-primary p-1 text-light rounded hover:bg-dark cursor-pointer'
                             >
-                                Upload Resume
+                                Resume
                             </button>
                         </div>
                     </div>
@@ -473,6 +475,108 @@ const Profile = () => {
                     </div>
                 </div>
             )}
+
+            {TriggerResumeSection && (
+                <div className='fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4'>
+                    <div className='bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative'>
+                        <button
+                            onClick={() => setTriggerResumeSection(false)}
+                            className='absolute top-4 right-4 text-3xl text-gray-500 hover:text-red-600'
+                        >
+                            <FaTimes />
+                        </button>
+
+                        <h3 className='text-2xl  text-center '>
+                            {user.resume ? "Modify the existing resume" : "Upload a resume"}
+                        </h3>
+
+                        {user.resume ? (
+                            <div className=' text-center'>
+                                <div className='text-lg'>
+                                    Current Resume: <strong>{user.resume}</strong>
+                                </div>
+                                <br />
+                                <div className='flex flex-col gap-4'>
+                                    <a
+                                        href={`${import.meta.env.VITE_BASE_API_URL}/uploads/resumes/${user.resume}`}
+                                        target="_blank"
+                                        className='bg-yellow-500 text-dark py-1 px-2 rounded font-bold hover:bg-yellow-600 cursor-pointer block'
+                                    >
+                                        Download Resume
+                                    </a>
+                                    <label className='bg-blue-500 text-white py-1 px-2 rounded font-bold hover:bg-blue-600 cursor-pointer block text-center'>
+                                        Update Resume
+                                        <input
+                                            type="file"
+                                            accept=".pdf,.doc,.docx"
+                                            className='hidden'
+                                            onChange={async (e) => {
+                                                const file = e.target.files[0];
+                                                if (!file) return;
+                                                try {
+                                                    await uploadUserResume(localStorage.getItem("token"), file);
+                                                    triggerMessage("success", "Resume updated successfully!");
+                                                    fetchUserProfile();
+                                                    setTriggerResumeSection(false);
+                                                } catch (err) {
+                                                    triggerMessage("danger", "Update failed");
+                                                }
+                                            }}
+                                        />
+                                    </label>
+
+                                    {/* Delete */}
+                                    <button
+                                        onClick={async () => {
+                                            if (confirm("Are you sure you want to delete your resume?")) {
+                                                try {
+                                                    await deleteUserResume(localStorage.getItem("token"));
+                                                    triggerMessage("success", "Resume deleted");
+                                                    fetchUserProfile();
+                                                    setTriggerResumeSection(false);
+                                                } catch (err) {
+                                                    triggerMessage("danger", "Delete failed");
+                                                }
+                                            }
+                                        }}
+                                        className='bg-red-500 text-white py-1 px-2 rounded font-bold hover:bg-red-600 cursor-pointer'
+                                    >
+                                        Delete Resume
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className='text-center '>
+                                <p className='text-lg'>No resume uploaded yet.</p>
+                                <label className='block'>
+                                    <span className='bg-blue-500 text-white p-1 rounded-lg font-bold text-lg cursor-pointer hover:bg-blue-600 inline-block'>
+                                        Upload Resume (PDF/DOC/DOCX)
+                                    </span>
+                                    <input
+                                        type="file"
+                                        accept=".pdf,.doc,.docx"
+                                        className='hidden'
+                                        onChange={async (e) => {
+                                            const file = e.target.files[0];
+                                            if (!file) return;
+                                            try {
+                                                await uploadUserResume(localStorage.getItem("token"), file);
+                                                triggerMessage("success", "Resume uploaded successfully!");
+                                                fetchUserProfile();
+                                                setTriggerResumeSection(false);
+                                            } catch (err) {
+                                                triggerMessage("danger", "Upload failed — Only PDF, DOC, DOCX allowed");
+                                            }
+                                        }}
+                                    />
+                                </label>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+
         </>
     );
 }

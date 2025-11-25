@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
+    resume: {
+        type: String,
+        default: null,
+    },
     email: {
         type: emailSchema,
         required: true,

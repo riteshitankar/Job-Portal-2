@@ -4,7 +4,8 @@ import { redisClient } from "../utils/redisClient.js"
 import { userModel } from "../models/userSchema.js"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
-
+import fs from 'fs';
+import path from 'path';
 dotenv.config({ path: "./config.env" })
 
 // to send a email we need a transporter 
@@ -343,4 +344,46 @@ let updateUserBio = async (req, res) => {
 
 
 
-export { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile }
+// Upload Resume
+const uploadResume = async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+
+        const resumeFilename = req.file.filename;
+
+        const updatedUser = await userModel.findByIdAndUpdate(
+            req.user._id,
+            { resume: resumeFilename },
+            { new: true }
+        );
+
+        res.status(200).json({
+            message: "Resume uploaded successfully!",
+            resume: updatedUser.resume
+        });
+    } catch (err) {
+        res.status(500).json({ message: "Resume upload failed" });
+    }
+};
+
+// Delete Resume
+const deleteResume = async (req, res) => {
+    try {
+        const user = await userModel.findById(req.user._id);
+        if (!user.resume) return res.status(400).json({ message: "No resume to delete" });
+
+        // Delete file from server
+        const filePath = path.join(process.cwd(), "uploads", "resumes", user.resume);
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+
+        user.resume = null;
+        await user.save();
+
+        res.status(200).json({ message: "Resume deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ message: "Failed to delete resume" });
+    }
+};
+
+
+export { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile }

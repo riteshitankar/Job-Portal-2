@@ -1,7 +1,7 @@
 import express from "express"
-import { test, handleUserRegister, handleOTPVerification, handleUserLogin, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile, updateUserBio } from "../controllers/userController.js"
+import { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile  } from "../controllers/userController.js"
 import { AuthUser } from "../middlewares/AuthUser.js"
-import { upload } from "../config/multerConfig.js"
+import upload from "../config/multerConfig.js"
 
 let userRouter = express.Router()
 
@@ -19,11 +19,14 @@ userRouter.post("/verify-reset-password-request", handleOTPForPasswordReset)
 
 // to upload resume/profie/docs we need to verfiy the user
 
-userRouter.post("/upload-file/:file_type", AuthUser, upload.single("file"), handleUserFileUpload)
+// userRouter.post("/upload-file/:file_type", AuthUser, upload.single("file"), handleUserFileUpload)
 // only profile_picture and resume
 
 userRouter.get("/fetch-user-profile", AuthUser, fetchProfile)
 
 userRouter.patch("/update-bio", AuthUser, updateUserBio);
+
+userRouter.post("/upload-resume", AuthUser, upload, uploadResume);
+userRouter.delete("/delete-resume", AuthUser, deleteResume);
 
 export { userRouter }

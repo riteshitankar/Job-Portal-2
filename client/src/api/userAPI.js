@@ -115,6 +115,32 @@ export const updateUserBio = async (token, bio) => {
 };
 
 
+// src/api/userAPI.js
+export const uploadUserResume = (token, file) => {
+    const formData = new FormData();
+    formData.append("resume", file);  // ← MUST be named "resume"
+
+    return axios.post(
+        `${import.meta.env.VITE_BASE_API_URL}/user/upload-resume`,
+        formData,
+        {
+            headers: {
+                authorization: token,
+                // DO NOT set Content-Type — let browser set it with boundary
+            }
+        }
+    );
+};
+
+export const deleteUserResume = (token) => {
+    return axios.delete(
+        `${import.meta.env.VITE_BASE_API_URL}/user/delete-resume`,
+        {
+            headers: { authorization: token }
+        }
+    );
+};
+
 
 
 
