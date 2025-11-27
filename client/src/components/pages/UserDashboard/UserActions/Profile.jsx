@@ -132,7 +132,6 @@ const Profile = () => {
                                                 onClick={() => setTriggerProfilePictureChange(true)}
                                                 className='bg-primary px-2 py-1 bg-white rounded hover:bg-yellow-800 z-10'
                                                 style={{ cursor: 'pointer', display: showPasswordReset || showBioPopup || TriggerResumeSection ? 'none' : 'block' }}
-                                            // fine
                                             >
                                                 <FaCamera />
                                             </button>

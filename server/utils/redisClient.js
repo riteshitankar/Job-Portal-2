@@ -22,9 +22,6 @@
 
 // // to store a temp data(otp)
 
-
-
-
 // server/utils/redisClient.js
 import { createClient } from "redis";
 import dotenv from "dotenv";

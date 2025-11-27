@@ -2,6 +2,8 @@ import express from "express"
 import { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile  } from "../controllers/userController.js"
 import { AuthUser } from "../middlewares/AuthUser.js"
 import upload from "../config/multerConfig.js"
+import profilePicUpload from "../config/multerProfilePic.js";
+
 
 let userRouter = express.Router()
 
@@ -23,6 +25,18 @@ userRouter.post("/verify-reset-password-request", handleOTPForPasswordReset)
 // only profile_picture and resume
 
 userRouter.get("/fetch-user-profile", AuthUser, fetchProfile)
+
+userRouter.post(
+    "/upload-file/:file_type",
+    AuthUser,
+    (req, res, next) => {
+        if (req.params.file_type === "profile_picture") return profilePicUpload(req, res, next);
+        if (req.params.file_type === "resume") return upload(req, res, next);
+
+        return res.status(400).json({ message: "Invalid file type" });
+    },
+    handleUserFileUpload
+);
 
 userRouter.patch("/update-bio", AuthUser, updateUserBio);
 
