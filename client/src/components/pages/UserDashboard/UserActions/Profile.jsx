@@ -505,7 +505,7 @@ const Profile = () => {
                                         Preview or Download
                                     </a>
                                     <label className='bg-blue-500 text-white py-1 px-2 rounded font-bold hover:bg-blue-600 cursor-pointer block text-center'>
-                                        Update 
+                                        Update
                                         <input
                                             type="file"
                                             accept=".pdf,.doc,.docx"
@@ -547,7 +547,7 @@ const Profile = () => {
                             </div>
                         ) : (
                             <div className='text-center '>
-                                <p className='text-lg'>No resume uploaded yet.</p>
+                                <p className='text-lg'>resume is not uploaded yet</p>
                                 <label className='block'>
                                     <span className='bg-blue-500 text-white p-1 rounded-lg font-bold text-lg cursor-pointer hover:bg-blue-600 inline-block'>
                                         Upload Resume (PDF/DOC/DOCX)
