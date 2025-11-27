@@ -301,7 +301,7 @@ const Profile = () => {
 
                             <button
                                 onClick={() => setTriggerResumeSection(true)}
-                                className='bg-primary p-1 text-light rounded hover:bg-dark cursor-pointer'
+                                className='bg-primary text-light px-4 py-2 rounded bg-blue-500 hover:bg-blue-700 font-medium cursor-pointer'
                             >
                                 Resume
                             </button>
@@ -502,10 +502,10 @@ const Profile = () => {
                                         target="_blank"
                                         className='bg-yellow-500 text-dark py-1 px-2 rounded font-bold hover:bg-yellow-600 cursor-pointer block'
                                     >
-                                        Download Resume
+                                        Preview or Download
                                     </a>
                                     <label className='bg-blue-500 text-white py-1 px-2 rounded font-bold hover:bg-blue-600 cursor-pointer block text-center'>
-                                        Update Resume
+                                        Update 
                                         <input
                                             type="file"
                                             accept=".pdf,.doc,.docx"
@@ -541,7 +541,7 @@ const Profile = () => {
                                         }}
                                         className='bg-red-500 text-white py-1 px-2 rounded font-bold hover:bg-red-600 cursor-pointer'
                                     >
-                                        Delete Resume
+                                        Delete
                                     </button>
                                 </div>
                             </div>
