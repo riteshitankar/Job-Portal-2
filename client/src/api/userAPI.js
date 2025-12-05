@@ -141,6 +141,13 @@ export const deleteUserResume = (token) => {
     );
 };
 
+export const applyForJob = async (token, jobId) => {
+  return await axios.post(
+    `${import.meta.env.VITE_BASE_API_URL}/job/apply/${jobId}`,
+    {},
+    { headers: { authorization: token } }
+  );
+};
 
 
 

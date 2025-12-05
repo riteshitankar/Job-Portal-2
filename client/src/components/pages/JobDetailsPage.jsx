@@ -4,9 +4,18 @@ import { getAllJobsAPI } from "../../api/companyAPI";
 import Header from "../sections/includes/Header";
 import Footer from "../sections/includes/Footer";
 
+
+import { applyForJob } from "../../api/userAPI";
+import { useUser } from "../../context/userContext";
+import { useMessage } from "../../context/messageContext";
+
+
 const JobDetailsPage = () => {
     const { jobId } = useParams();
+    const { triggerMessage } = useMessage();
+    const { user } = useUser();
     const [job, setJob] = useState(null);
+
 
     useEffect(() => {
         fetchJobDetails();
@@ -34,7 +43,26 @@ const JobDetailsPage = () => {
         );
 
     const { title, jobRequirements, jobCreatedBy } = job;
+    const hasApplied = job.applications?.includes(user?._id);
 
+
+
+    const applyNow = async () => {
+        const token = localStorage.getItem("token");  // <-- FIXED
+        if (!token) return triggerMessage("warning", "Please login as a user first!");
+
+        try {
+            await applyForJob(token, job._id);
+            setJob((prev) => ({
+                ...prev,
+                applications: [...prev.applications, user._id]
+            }));
+
+            triggerMessage("success", "Applied Successfully!");
+        } catch (err) {
+            triggerMessage("danger", err?.response?.data?.message || "Failed to apply");
+        }
+    };
 
     return (
         <>
@@ -98,6 +126,22 @@ const JobDetailsPage = () => {
                 </p>
 
                 <hr className="my-4" />
+
+                <div className="job-description mb-6">
+                    <h3 className="text-xl font-semibold mb-2">Job Description</h3>
+                    <p>{job.jobRequirements.description}</p>
+                </div>
+
+                <button
+                    onClick={applyNow}
+                    disabled={hasApplied}
+                    className={`px-4 py-2 rounded mt-4 text-white 
+    ${hasApplied ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}`}
+                >
+                    {hasApplied ? "Already Applied" : "Apply Now"}
+                </button>
+
+
 
                 <Link
                     to="/"

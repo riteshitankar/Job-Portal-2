@@ -2,6 +2,8 @@ import { useState, useEffect, createContext, useContext, Children } from "react"
 
 import { requestUserProfile } from "../api/userAPI.js"
 
+
+
 const userContext = createContext()
 
 let UserProvider = ({ children }) => {
