@@ -17,6 +17,9 @@ import { MessageProvider } from './context/messageContext.jsx';
 // global UI
 import Message from './components/sections/actions/Message.jsx';
 
+// for job detail page 
+import JobDetailsPage from "./components/pages/JobDetailsPage.jsx";
+
 const App = () => {
   return (
     <>
@@ -36,6 +39,9 @@ const App = () => {
                 {/* Company routes */}
                 <Route path='/company-login-register' element={<CompanyLoginRegisterPage />} />
                 <Route path='/company/dashboard' element={<CompanyDashboard />} />
+                {/* job details page  */}
+                <Route path="/job/:jobId" element={<JobDetailsPage />} />
+
               </Routes>
             </Router>
 

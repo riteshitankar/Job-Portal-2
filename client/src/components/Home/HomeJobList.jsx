@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getAllJobsAPI } from "../../api/companyAPI";
+import { Link } from "react-router-dom";
 
 const HomeJobList = () => {
   const [jobs, setJobs] = useState([]);
@@ -20,8 +21,8 @@ const HomeJobList = () => {
   return (
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {jobs.map((job) => (
-        <div 
-          key={job._id} 
+        <div
+          key={job._id}
           className="border rounded-lg p-5 shadow hover:shadow-lg transition bg-white"
         >
           <h2 className="text-xl font-bold text-blue-700">{job.title}</h2>
@@ -39,12 +40,19 @@ const HomeJobList = () => {
             })}
           </p>
 
-          <button
+          {/* <button
             onClick={() => window.location.href = `/job/${job._id}`}
             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800"
           >
             View More
-          </button>
+          </button> */}
+          <Link
+            to={`/job/${job._id}`}
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            View More
+          </Link>
+
         </div>
       ))}
     </div>
