@@ -134,12 +134,11 @@ const createJob = async (req, res) => {
   }
 };
 
-
 const getJobData = async (req, res) => {
   try {
     let jobData = await jobModel
       .find({})
-      .populate("jobCreatedBy", "companyDetails.name companyDetails.industryType"); 
+      .populate("jobCreatedBy", "companyDetails name companyLogo");  // <-- FIX
 
     res.status(200).json({ message: "got job/s data !", jobData });
   } catch (err) {
@@ -147,6 +146,7 @@ const getJobData = async (req, res) => {
     res.status(500).json({ message: "unable to send jobs data at this moment !", err });
   }
 };
+
 
 
 
