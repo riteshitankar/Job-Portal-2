@@ -97,15 +97,8 @@ const handleJobApplication = async (req, res) => {
 }
 
 // get job details(filters)
-const getJobData = async (req, res) => {
-  try {
-    let jobData = await jobModel.find({})
-    res.status(200).json({ message: "got job/s data !", jobData })
-  } catch (err) {
-    console.log("unable to get job data : ", err)
-    res.status(500).json({ message: "unable to send jobs data at this moment !", err })
-  }
-}
+
+
 
 const createJob = async (req, res) => {
   try {
@@ -140,6 +133,21 @@ const createJob = async (req, res) => {
     res.status(400).json({ message: "unable to add job !", err });
   }
 };
+
+
+const getJobData = async (req, res) => {
+  try {
+    let jobData = await jobModel
+      .find({})
+      .populate("jobCreatedBy", "companyDetails.name companyDetails.industryType"); 
+
+    res.status(200).json({ message: "got job/s data !", jobData });
+  } catch (err) {
+    console.log("unable to get job data : ", err);
+    res.status(500).json({ message: "unable to send jobs data at this moment !", err });
+  }
+};
+
 
 
 
