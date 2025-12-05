@@ -5,6 +5,8 @@ import cors from "cors"
 import "./database/conn.js"
 import { userRouter } from "./routers/userRouter.js"
 import { companyRouter } from "./routers/companyRouter.js";
+import { jobRouter } from "./routers/jobRouter.js"; // add at top with other routers
+
 
 dotenv.config({ path: "./config.env" })
 const app = express()
@@ -20,8 +22,10 @@ const corsOptions = {
 app.use(cors(corsOptions))
 // routers
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
-app.use("/user", userRouter)
+app.use("/user", userRouter);
 app.use("/company", companyRouter);
+app.use("/job", jobRouter);
+
 
 // handle 404 route
 app.use((req, res) => {

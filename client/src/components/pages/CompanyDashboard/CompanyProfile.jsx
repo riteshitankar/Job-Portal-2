@@ -4,6 +4,7 @@ import "react-quill/dist/quill.snow.css";
 import { useCompany } from "../../../context/companyContext.jsx";
 import { useMessage } from "../../../context/messageContext.jsx";
 import { companyUploadFile, uploadCompanyDocument, deleteCompanyDocument, updateCompanyBio } from "../../../api/companyAPI.js";
+import CompanyPostJobForm from "./CompanyPostJobForm.jsx";
 
 const CompanyProfile = () => {
   const { company, fetchCompanyProfile } = useCompany();
@@ -122,6 +123,15 @@ const CompanyProfile = () => {
                 </li>
               )) : <li>No documents uploaded</li>}
             </ul>
+            {/* POST A JOB SECTION */}
+            <div className="mt-6">
+              <h3 className="font-semibold">Job Management</h3>
+              <div style={{backgroundColor:'red'}}>
+              <CompanyPostJobForm />
+              </div>
+            </div>
+
+
           </div>
         </div>
       </div>

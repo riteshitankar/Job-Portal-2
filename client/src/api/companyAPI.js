@@ -1,6 +1,7 @@
 import axios from "axios";
 
 let baseUrl = import.meta.env.VITE_BASE_API_URL + "/company";
+const BASE = import.meta.env.VITE_BASE_API_URL || "http://localhost:5000";
 
 export const requestCompanyRegister = async (data) => {
   try {
@@ -111,3 +112,40 @@ export const verifyCompanyPasswordReset = async (data) => {
     throw err;
   }
 };
+
+
+
+// create a job (company)
+
+
+// get all jobs (public)
+export const getAllJobs = async () => {
+  try {
+    const result = await axios.get(`${baseUrl.replace('/user','')}/job/get-jobs`);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const createCompanyJob = async (token, payload) => {
+  return await axios.post(
+    `${import.meta.env.VITE_BASE_API_URL}/job/create`,
+    payload,
+    {
+      headers: {
+        authorization: token   // <-- this is correct for your backend
+      }
+    }
+  );
+};
+
+
+
+// Get all jobs (public)
+export const getAllJobsAPI = async () => {
+  return await axios.get(`${BASE}/job/get-jobs`);
+};
+
+
+

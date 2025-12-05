@@ -16,6 +16,7 @@ import { AuthCompany } from "../middlewares/AuthCompany.js";
 import companyLogoUpload from "../config/multerCompanyLogo.js";
 import companyDocUpload from "../config/multerCompanyDoc.js";
 
+
 const companyRouter = express.Router();
 
 companyRouter.get("/test", testCompany);
