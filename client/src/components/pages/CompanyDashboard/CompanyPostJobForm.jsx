@@ -98,7 +98,6 @@ const CompanyPostJobForm = ({ onPosted }) => {
         }
     };
 
-
     return (
         <div className="mt-6">
             <button onClick={() => setOpen(!open)} className="bg-primary text-white px-4 py-2 rounded">

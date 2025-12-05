@@ -5,6 +5,8 @@ import { useCompany } from "../../../context/companyContext.jsx";
 import { useMessage } from "../../../context/messageContext.jsx";
 import { companyUploadFile, uploadCompanyDocument, deleteCompanyDocument, updateCompanyBio } from "../../../api/companyAPI.js";
 import CompanyPostJobForm from "./CompanyPostJobForm.jsx";
+import CompanyJobList from "./CompanyJobList.jsx";
+
 
 const CompanyProfile = () => {
   const { company, fetchCompanyProfile } = useCompany();
@@ -15,6 +17,8 @@ const CompanyProfile = () => {
   const [showBioPopup, setShowBioPopup] = useState(false);
   const [bioValue, setBioValue] = useState(company.companyDetails?.bio || "");
   const [showDocumentsModal, setShowDocumentsModal] = useState(false);
+
+  
 
   const handleLogoSelect = (e) => {
     const file = e.target.files[0];
@@ -128,6 +132,7 @@ const CompanyProfile = () => {
               <h3 className="font-semibold">Job Management</h3>
               <div style={{backgroundColor:'red'}}>
               <CompanyPostJobForm />
+              <CompanyJobList/>
               </div>
             </div>
 

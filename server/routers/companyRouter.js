@@ -15,6 +15,8 @@ import {
 import { AuthCompany } from "../middlewares/AuthCompany.js";
 import companyLogoUpload from "../config/multerCompanyLogo.js";
 import companyDocUpload from "../config/multerCompanyDoc.js";
+import { jobModel } from "../models/jobSchema.js";
+// import { AuthCompany } from "../middlewares/AuthCompany.js";
 
 
 const companyRouter = express.Router();
@@ -46,5 +48,24 @@ companyRouter.post("/upload-document", AuthCompany, companyDocUpload, uploadComp
 companyRouter.delete("/delete-document", AuthCompany, deleteCompanyDocument);
 
 companyRouter.patch("/update-bio", AuthCompany, updateCompanyBio);
+
+
+
+
+companyRouter.get("/my-jobs", AuthCompany, async (req, res) => {
+  try {
+    let company = req.company;
+
+    let jobs = await jobModel.find({ jobCreatedBy: company._id })
+      .sort({ timeStamp: -1 });
+
+    res.status(200).json({ message: "company jobs", jobs });
+  } catch (err) {
+    res.status(500).json({ message: "unable to load jobs" });
+  }
+});
+
+
+
 
 export { companyRouter };

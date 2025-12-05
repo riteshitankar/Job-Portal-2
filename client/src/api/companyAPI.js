@@ -128,6 +128,19 @@ export const getAllJobs = async () => {
   }
 };
 
+
+
+
+
+// Get all jobs (public)
+export const getAllJobsAPI = async () => {
+  return await axios.get(`${BASE}/job/get-jobs`);
+};
+
+
+
+
+
 export const createCompanyJob = async (token, payload) => {
   return await axios.post(
     `${import.meta.env.VITE_BASE_API_URL}/job/create`,
@@ -142,10 +155,28 @@ export const createCompanyJob = async (token, payload) => {
 
 
 
-// Get all jobs (public)
-export const getAllJobsAPI = async () => {
-  return await axios.get(`${BASE}/job/get-jobs`);
+
+
+
+
+// delete company job
+export const deleteCompanyJob = async (token, jobId) => {
+  return await axios.post(
+    `${import.meta.env.VITE_BASE_API_URL}/job/action/delete/${jobId}`,
+    {},
+    {
+      headers: { authorization: token }
+    }
+  );
 };
 
-
+// get jobs created by this company
+export const getCompanyJobs = async (token) => {
+  return await axios.get(
+    `${import.meta.env.VITE_BASE_API_URL}/company/my-jobs`,
+    {
+      headers: { authorization: token }
+    }
+  );
+};
 
