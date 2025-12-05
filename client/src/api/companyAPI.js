@@ -1,0 +1,113 @@
+import axios from "axios";
+
+let baseUrl = import.meta.env.VITE_BASE_API_URL + "/company";
+
+export const requestCompanyRegister = async (data) => {
+  try {
+    let result = await axios.post(`${baseUrl}/register`, data);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const requestCompanyEmailOtpVerification = async (data) => {
+  try {
+    let result = await axios.post(`${baseUrl}/verify-otp`, data);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const requestCompanyLogin = async (data) => {
+  try {
+    let result = await axios.post(`${baseUrl}/company-login`, data);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const requestCompanyProfile = async (token) => {
+  try {
+    let result = await axios({
+      method: "GET",
+      url: `${baseUrl}/fetch-company-profile`,
+      headers: { authorization: token }
+    });
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const companyUploadFile = async (token, fileType, formData) => {
+  try {
+    const result = await axios.post(
+      `${baseUrl}/upload-file/${fileType}`,
+      formData,
+      {
+        headers: {
+          authorization: token
+          // do not set Content-Type manually; browser will set multipart/form-data
+        }
+      }
+    );
+    return result.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const uploadCompanyDocument = async (token, formData) => {
+  try {
+    const result = await axios.post(`${baseUrl}/upload-document`, formData, {
+      headers: { authorization: token }
+    });
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const deleteCompanyDocument = async (token, filename) => {
+  try {
+    const result = await axios.delete(`${baseUrl}/delete-document`, {
+      headers: { authorization: token },
+      data: { filename }
+    });
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const updateCompanyBio = async (token, bio) => {
+  try {
+    const result = await axios.patch(`${baseUrl}/update-bio`, { bio }, {
+      headers: { authorization: token }
+    });
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const requestCompanyPasswordReset = async (email) => {
+  try {
+    const result = await axios.post(`${baseUrl}/password-reset-request`, { email });
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const verifyCompanyPasswordReset = async (data) => {
+  try {
+    const result = await axios.post(`${baseUrl}/verify-reset-password-request`, data);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};

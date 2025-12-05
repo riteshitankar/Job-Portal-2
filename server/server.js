@@ -4,6 +4,8 @@ import dotenv from "dotenv"
 import cors from "cors"
 import "./database/conn.js"
 import { userRouter } from "./routers/userRouter.js"
+import { companyRouter } from "./routers/companyRouter.js";
+
 dotenv.config({ path: "./config.env" })
 const app = express()
 let port = process.env.PORT || 5012
@@ -19,6 +21,8 @@ app.use(cors(corsOptions))
 // routers
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/user", userRouter)
+app.use("/company", companyRouter);
+
 // handle 404 route
 app.use((req, res) => {
   console.log("user trying to access invalid route !")
