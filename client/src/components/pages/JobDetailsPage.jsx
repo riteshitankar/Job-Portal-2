@@ -60,7 +60,7 @@ const JobDetailsPage = () => {
 
             triggerMessage("success", "Applied Successfully!");
         } catch (err) {
-            triggerMessage("danger", err?.response?.data?.message || "Failed to apply");
+            triggerMessage("danger", err?.response?.data?.message || "Fail to apply");
         }
     };
 
@@ -127,16 +127,16 @@ const JobDetailsPage = () => {
 
                 <hr className="my-4" />
 
-                <div className="job-description mb-6">
-                    <h3 className="text-xl font-semibold mb-2">Job Description</h3>
-                    <p>{job.jobRequirements.description}</p>
-                </div>
+                <p className="text-gray-700 mb-4">
+                    <strong>Applicants:</strong> {job.applications?.length || 0}
+                </p>
+
 
                 <button
                     onClick={applyNow}
                     disabled={hasApplied}
-                    className={`px-4 py-2 rounded mt-4 text-white 
-    ${hasApplied ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}`}
+                    className={`px-4 py-2 rounded mt-4 text-white
+                        ${hasApplied ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}`}
                 >
                     {hasApplied ? "Already Applied" : "Apply Now"}
                 </button>
