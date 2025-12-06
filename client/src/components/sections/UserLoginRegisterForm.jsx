@@ -57,7 +57,7 @@ const UserLoginRegisterForm = () => {
 
       setLoginForm({ email: "", password: "" })
 
-localStorage.setItem("token", res.data.token);
+localStorage.setItem("token", result.data.token);
 
       triggerMessage("success", result.data.message ? result.data.message : "Login was successfull ! Redirecting to Dashboard.")
 
