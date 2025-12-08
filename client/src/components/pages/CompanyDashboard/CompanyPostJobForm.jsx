@@ -1,27 +1,37 @@
-import React, { useState } from "react";
-import { createCompanyJob } from "../../../api/companyAPI.js";
+import React, { useState, useEffect } from "react";
+import { createCompanyJob, editCompanyJob } from "../../../api/companyAPI.js";
 import { useMessage } from "../../../context/messageContext.jsx";
 import { useCompany } from "../../../context/companyContext.jsx";
 
-const CompanyPostJobForm = ({ onPosted }) => {
+const CompanyPostJobForm = ({ onPosted, editJobData = null, onEdited = null }) => {
     const { triggerMessage } = useMessage();
     const { fetchCompanyProfile } = useCompany();
 
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
 
-    const [form, setForm] = useState({
-        title: "",
-        jobRequirements: {
-            type: "",
-            category: "",
-            exprience: "",
-            location: "",
-            offeredSalary: "",
-            description: "",
-        },
-        maxApplications: ""
-    });
+    const [form, setForm] = useState(
+        editJobData || {
+            title: "",
+            jobRequirements: {
+                type: "",
+                category: "",
+                exprience: "",
+                location: "",
+                offeredSalary: "",
+                description: "",
+            },
+            maxApplications: 0,
+        }
+    );
+
+    // Auto-open and preload when editing
+    useEffect(() => {
+        if (editJobData) {
+            setForm(editJobData);
+            setOpen(true);
+        }
+    }, [editJobData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -42,66 +52,52 @@ const CompanyPostJobForm = ({ onPosted }) => {
 
     const submit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+
+        const token = localStorage.getItem("company_token");
+
+        const payload = {
+            title: form.title,
+            jobRequirements: {
+                ...form.jobRequirements,
+                postDate: form.jobRequirements.postDate || new Date(),
+            },
+            maxApplications: Number(form.maxApplications),
+        };
+
         try {
-            setLoading(true);
-
-            const token = localStorage.getItem("company_token");
-            if (!token) throw new Error("Not authenticated");
-
-            // Build correct payload
-            const payload = {
-                title: form.title,
-                jobRequirements: {
-                    ...form.jobRequirements,
-                    postDate: new Date(),
-                    maxApplications: Number(form.maxApplications)
-                }
-            };
-
-            const res = await createCompanyJob(token, payload);
-
-            if (res.status === 202) {
+            if (editJobData) {
+                await editCompanyJob(token, editJobData._id, payload);
+                triggerMessage("success", "Job updated successfully!");
+                if (onEdited) onEdited();
+            } else {
+                await createCompanyJob(token, payload);
                 triggerMessage("success", "Job posted successfully!");
-
-                // Reset form
-                setForm({
-                    title: "",
-                    jobRequirements: {
-                        type: "",
-                        category: "",
-                        exprience: "",
-                        location: "",
-                        offeredSalary: "",
-                        description: ""
-                    },
-                    maxApplications: ""
-                });
-
-                setOpen(false);
-                await fetchCompanyProfile();
-
                 if (onPosted) onPosted();
             }
 
+            setOpen(false);
+
         } catch (err) {
-            console.log("post job err:", err);
-            triggerMessage(
-                "danger",
-                err?.response?.data?.err ||
-                err?.response?.data?.message ||
-                err?.message ||
-                "Failed to post job"
-            );
-        } finally {
-            setLoading(false);
+            triggerMessage("danger", "Failed to save job");
+            console.log(err);
         }
+
+        setLoading(false);
     };
 
     return (
         <div className="mt-6">
-            <button onClick={() => setOpen(!open)} className="bg-primary text-white px-4 py-2 rounded">
-                {open ? "Close Job Form" : "Post a Job"}
-            </button>
+
+            {/* NEW / EDIT job toggle button */}
+            {!editJobData && (
+                <button
+                    onClick={() => setOpen(!open)}
+                    className="bg-primary text-white px-4 py-2 rounded"
+                >
+                    {open ? "Close Job Form" : "Post a Job"}
+                </button>
+            )}
 
             {open && (
                 <form onSubmit={submit} className="mt-4 bg-white p-4 rounded shadow">
@@ -203,8 +199,9 @@ const CompanyPostJobForm = ({ onPosted }) => {
 
                     <div className="mt-4 flex gap-2">
                         <button type="submit" disabled={loading} className="bg-green-600 text-white px-4 py-2 rounded">
-                            {loading ? "Posting..." : "Post Job"}
+                            {loading ? "Saving..." : editJobData ? "Save Changes" : "Post Job"}
                         </button>
+
                         <button type="button" onClick={() => setOpen(false)} className="bg-gray-300 px-4 py-2 rounded">
                             Cancel
                         </button>

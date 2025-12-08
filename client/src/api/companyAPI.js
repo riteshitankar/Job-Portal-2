@@ -186,3 +186,13 @@ export const closeCompanyJob = async (token, jobId) => {
     }
   );
 };
+
+export const editCompanyJob = async (token, jobId, payload) => {
+  return await axios.patch(
+    `${import.meta.env.VITE_BASE_API_URL}/job/edit/${jobId}`,
+    payload,
+    {
+      headers: { authorization: token }
+    }
+  );
+};

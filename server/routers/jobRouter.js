@@ -3,7 +3,8 @@ import {
   createJob,
   handleJobAction,
   handleJobApplication,
-  getJobData
+  getJobData, 
+  editJob
 } from "../controllers/jobController.js";
 import { AuthCompany } from "../middlewares/AuthCompany.js";
 import { AuthUser } from "../middlewares/AuthUser.js";
@@ -21,5 +22,8 @@ jobRouter.post("/apply/:jobId", AuthUser, handleJobApplication);
 
 // get all jobs (public)
 jobRouter.get("/get-jobs", getJobData);
+
+// for edit job 
+jobRouter.patch("/edit/:jobId", AuthCompany, editJob);
 
 export { jobRouter };

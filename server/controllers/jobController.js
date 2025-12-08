@@ -120,4 +120,39 @@ const getJobData = async (req, res) => {
   }
 };
 
-export { createJob, handleJobAction, handleJobApplication, getJobData };
+const editJob = async (req, res) => {
+  try {
+    const company = req.company;
+    if (!company) throw "Invalid request. Please login first!";
+
+    const { jobId } = req.params;
+    const { title, jobRequirements, maxApplications } = req.body;
+
+    const job = await jobModel.findById(jobId);
+    if (!job) throw "Job not found!";
+    if (job.jobCreatedBy.toString() !== company._id.toString())
+      throw "Unauthorized — this job does not belong to you.";
+
+    const updatedJob = await jobModel.findByIdAndUpdate(
+      jobId,
+      {
+        title,
+        jobRequirements,
+        maxApplications,
+      },
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: "Job updated successfully!",
+      updatedJob,
+    });
+
+  } catch (err) {
+    console.log("edit job error:", err);
+    res.status(400).json({ message: "Unable to update job!", err });
+  }
+};
+
+
+export { createJob, handleJobAction, handleJobApplication, getJobData, editJob };

@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { getCompanyJobs, deleteCompanyJob, closeCompanyJob } from "../../../api/companyAPI.js";
 import { useMessage } from "../../../context/messageContext.jsx";
+import CompanyPostJobForm from "./CompanyPostJobForm.jsx";
 
 const CompanyJobList = ({ refresh = 0 }) => {
     const [jobs, setJobs] = useState([]);
     const { triggerMessage } = useMessage();
+    const [editJob, setEditJob] = useState(null);
+
+
 
     const token = localStorage.getItem("company_token");
 
@@ -56,6 +60,17 @@ const CompanyJobList = ({ refresh = 0 }) => {
     return (
         <div className="mt-6 bg-white p-4 rounded shadow">
             <h3 className="text-xl font-semibold mb-3">My Posted Jobs</h3>
+
+            {editJob && (
+                <CompanyPostJobForm
+                    editJobData={editJob}
+                    onEdited={() => {
+                        setEditJob(null);
+                        loadJobs();
+                    }}
+                />
+            )}
+
 
             {jobs.length === 0 ? (
                 <div>No jobs posted yet.</div>
@@ -113,6 +128,14 @@ const CompanyJobList = ({ refresh = 0 }) => {
                                             Closed
                                         </span>
                                     )}
+                                    {/* edit  */}
+                                    <button
+                                        onClick={() => setEditJob(job)}
+                                        className="text-blue-500 hover:underline mr-3"
+                                    >
+                                        Edit
+                                    </button>
+
 
                                     {/* DELETE BUTTON */}
                                     <button
