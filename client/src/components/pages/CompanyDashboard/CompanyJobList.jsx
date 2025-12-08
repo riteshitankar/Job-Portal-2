@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getCompanyJobs, deleteCompanyJob, closeCompanyJob } from "../../../api/companyAPI.js";
 import { useMessage } from "../../../context/messageContext.jsx";
 
-const CompanyJobList = () => {
+const CompanyJobList = ({ refresh = 0 }) => {
     const [jobs, setJobs] = useState([]);
     const { triggerMessage } = useMessage();
 
@@ -21,7 +21,7 @@ const CompanyJobList = () => {
 
     useEffect(() => {
         loadJobs();
-    }, []);
+    }, [refresh]);
 
     // DELETE JOB
     const handleDelete = async (jobId) => {

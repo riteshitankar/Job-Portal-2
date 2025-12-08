@@ -17,8 +17,10 @@ const CompanyProfile = () => {
   const [showBioPopup, setShowBioPopup] = useState(false);
   const [bioValue, setBioValue] = useState(company.companyDetails?.bio || "");
   const [showDocumentsModal, setShowDocumentsModal] = useState(false);
+  const [jobRefresh, setJobRefresh] = useState(0);
 
-  
+
+
 
   const handleLogoSelect = (e) => {
     const file = e.target.files[0];
@@ -130,9 +132,11 @@ const CompanyProfile = () => {
             {/* POST A JOB SECTION */}
             <div className="mt-6">
               <h3 className="font-semibold">Job Management</h3>
-              <div style={{backgroundColor:'red'}}>
-              <CompanyPostJobForm />
-              <CompanyJobList/>
+              <div style={{ backgroundColor: 'red' }}>
+                <CompanyPostJobForm onPosted={() => {
+                  setJobRefresh((v) => v + 1);
+                }} />
+                <CompanyJobList refresh={jobRefresh} />
               </div>
             </div>
 
