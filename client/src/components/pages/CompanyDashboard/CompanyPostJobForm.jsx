@@ -5,51 +5,64 @@ import { useCompany } from "../../../context/companyContext.jsx";
 
 const CompanyPostJobForm = ({ onPosted, editJobData = null, onEdited = null }) => {
     const { triggerMessage } = useMessage();
-    const { fetchCompanyProfile } = useCompany();
 
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
 
-    const [form, setForm] = useState(
-        editJobData || {
-            title: "",
-            jobRequirements: {
-                type: "",
-                category: "",
-                exprience: "",
-                location: "",
-                offeredSalary: "",
-                description: "",
-            },
-            maxApplications: 0,
-        }
-    );
+    const emptyForm = {
+        title: "",
+        jobRequirements: {
+            type: "",
+            category: "",
+            exprience: "",
+            location: "",
+            offeredSalary: "",
+            description: "",
+        },
+        maxApplications: 0,
+    };
 
-    // Auto-open and preload when editing
+    const [form, setForm] = useState(emptyForm);
+
     useEffect(() => {
         if (editJobData) {
-            setForm(editJobData);
+            setForm({
+                title: editJobData.title || "",
+                jobRequirements: {
+                    type: editJobData.jobRequirements?.type || "",
+                    category: editJobData.jobRequirements?.category || "",
+                    exprience: editJobData.jobRequirements?.exprience || "",
+                    location: editJobData.jobRequirements?.location || "",
+                    offeredSalary: editJobData.jobRequirements?.offeredSalary || "",
+                    description: editJobData.jobRequirements?.description || "",
+                    postDate: editJobData.jobRequirements?.postDate || new Date(),
+                },
+                maxApplications: editJobData.maxApplications || 0,
+            });
+
             setOpen(true);
         }
     }, [editJobData]);
 
+    // FORM FIELD HANDLER
     const handleChange = (e) => {
         const { name, value } = e.target;
 
         if (name.includes("jobRequirements.")) {
             const key = name.split(".")[1];
-            setForm(prev => ({
+            setForm((prev) => ({
                 ...prev,
                 jobRequirements: {
                     ...prev.jobRequirements,
-                    [key]: value
-                }
+                    [key]: value,
+                },
             }));
         } else {
-            setForm(prev => ({ ...prev, [name]: value }));
+            setForm((prev) => ({ ...prev, [name]: value }));
         }
     };
 
+    // SUBMIT FORM
     const submit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -69,18 +82,19 @@ const CompanyPostJobForm = ({ onPosted, editJobData = null, onEdited = null }) =
             if (editJobData) {
                 await editCompanyJob(token, editJobData._id, payload);
                 triggerMessage("success", "Job updated successfully!");
-                if (onEdited) onEdited();
+                onEdited && onEdited();
             } else {
                 await createCompanyJob(token, payload);
                 triggerMessage("success", "Job posted successfully!");
-                if (onPosted) onPosted();
+                onPosted && onPosted();
             }
 
             setOpen(false);
+            setForm(emptyForm); // reset form after posting
 
         } catch (err) {
-            triggerMessage("danger", "Failed to save job");
             console.log(err);
+            triggerMessage("danger", "Failed to save job");
         }
 
         setLoading(false);
@@ -88,21 +102,20 @@ const CompanyPostJobForm = ({ onPosted, editJobData = null, onEdited = null }) =
 
     return (
         <div className="mt-6">
-
-            {/* NEW / EDIT job toggle button */}
             {!editJobData && (
                 <button
                     onClick={() => setOpen(!open)}
                     className="bg-primary text-white px-4 py-2 rounded"
                 >
-                    {open ? "Close Job Form" : "Post a Job"}
+                    {open ? "Close Job Form" : "Post a New Job"}
                 </button>
             )}
 
             {open && (
                 <form onSubmit={submit} className="mt-4 bg-white p-4 rounded shadow">
                     <div className="grid grid-cols-2 gap-4">
-
+                        
+                        {/* Title */}
                         <div>
                             <label className="opacity-70">Job Title</label>
                             <input
@@ -114,6 +127,7 @@ const CompanyPostJobForm = ({ onPosted, editJobData = null, onEdited = null }) =
                             />
                         </div>
 
+                        {/* Type */}
                         <div>
                             <label className="opacity-70">Job Type</label>
                             <input
@@ -125,6 +139,7 @@ const CompanyPostJobForm = ({ onPosted, editJobData = null, onEdited = null }) =
                             />
                         </div>
 
+                        {/* Category */}
                         <div>
                             <label className="opacity-70">Category</label>
                             <input
@@ -136,6 +151,7 @@ const CompanyPostJobForm = ({ onPosted, editJobData = null, onEdited = null }) =
                             />
                         </div>
 
+                        {/* Experience */}
                         <div>
                             <label className="opacity-70">Experience</label>
                             <input
@@ -147,6 +163,7 @@ const CompanyPostJobForm = ({ onPosted, editJobData = null, onEdited = null }) =
                             />
                         </div>
 
+                        {/* Location */}
                         <div>
                             <label className="opacity-70">Location</label>
                             <input
@@ -158,6 +175,7 @@ const CompanyPostJobForm = ({ onPosted, editJobData = null, onEdited = null }) =
                             />
                         </div>
 
+                        {/* Salary */}
                         <div>
                             <label className="opacity-70">Offered Salary</label>
                             <input
@@ -170,6 +188,7 @@ const CompanyPostJobForm = ({ onPosted, editJobData = null, onEdited = null }) =
                             />
                         </div>
 
+                        {/* Description */}
                         <div className="col-span-2">
                             <label className="opacity-70">Description</label>
                             <textarea
@@ -182,27 +201,39 @@ const CompanyPostJobForm = ({ onPosted, editJobData = null, onEdited = null }) =
                             />
                         </div>
 
+                        {/* Max Applications */}
                         <div>
                             <label className="opacity-70">Max Applications</label>
                             <input
                                 name="maxApplications"
                                 type="number"
-                                min="0"
                                 value={form.maxApplications}
-                                onChange={handleChange}
+                                onChange={(e) =>
+                                    setForm((prev) => ({
+                                        ...prev,
+                                        maxApplications: e.target.value,
+                                    }))
+                                }
                                 className="mt-2 w-full p-2 border rounded"
                                 required
                             />
                         </div>
-
                     </div>
 
                     <div className="mt-4 flex gap-2">
-                        <button type="submit" disabled={loading} className="bg-green-600 text-white px-4 py-2 rounded">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="bg-green-600 text-white px-4 py-2 rounded"
+                        >
                             {loading ? "Saving..." : editJobData ? "Save Changes" : "Post Job"}
                         </button>
 
-                        <button type="button" onClick={() => setOpen(false)} className="bg-gray-300 px-4 py-2 rounded">
+                        <button
+                            type="button"
+                            onClick={() => setOpen(false)}
+                            className="bg-gray-300 px-4 py-2 rounded"
+                        >
                             Cancel
                         </button>
                     </div>

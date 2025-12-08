@@ -56,7 +56,7 @@ const jobSchema = mongoose.Schema({
     },
     maxApplications: {
         type: Number,
-        default: 100
+        required: true
     },
     timeStamp: {
         type: Date,

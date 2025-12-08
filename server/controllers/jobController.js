@@ -8,8 +8,11 @@ const createJob = async (req, res) => {
     if (!company)
       return res.status(401).json({ message: "Login as company first" });
 
-    const { title, jobRequirements } = req.body;
-    if (!title || !jobRequirements)
+    const { title, jobRequirements, maxApplications } = req.body;
+
+    console.log("BODY RECEIVED:", req.body); // <-- DEBUG
+
+    if (!title || !jobRequirements || maxApplications === undefined)
       return res.status(400).json({ message: "Missing job data" });
 
     const { type, category, exprience, location, offeredSalary, description } =
@@ -22,21 +25,23 @@ const createJob = async (req, res) => {
       title,
       jobCreatedBy: company._id,
       jobRequirements,
-      maxApplications: jobRequirements.maxApplications,
+      maxApplications: Number(maxApplications)   // ✅ FIXED HERE
     });
 
-
     const result = await newJob.save();
+
     await companyModel.findByIdAndUpdate(company._id, {
       $push: { createJobs: result._id },
     });
 
     res.status(202).json({ message: "Job created successfully!" });
+
   } catch (err) {
     console.log("Job creation error:", err);
     res.status(500).json({ message: "Unable to create job", err });
   }
 };
+
 
 const handleJobAction = async (req, res) => {
   try {
