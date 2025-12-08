@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+
 import { getAllJobsAPI } from "../../api/companyAPI";
+import { applyForJob } from "../../api/userAPI";
+
 import Header from "../sections/includes/Header";
 import Footer from "../sections/includes/Footer";
 
-
-import { applyForJob } from "../../api/userAPI";
 import { useUser } from "../../context/userContext";
 import { useMessage } from "../../context/messageContext";
 
-
 const JobDetailsPage = () => {
     const { jobId } = useParams();
-    const { triggerMessage } = useMessage();
     const { user } = useUser();
-    const [job, setJob] = useState(null);
+    const { triggerMessage } = useMessage();
 
+    const [job, setJob] = useState(null);
 
     useEffect(() => {
         fetchJobDetails();
@@ -26,8 +26,8 @@ const JobDetailsPage = () => {
             const res = await getAllJobsAPI();
             const allJobs = res.data.jobData || [];
 
-            const foundJob = allJobs.find((j) => j._id === jobId);
-            setJob(foundJob);
+            const found = allJobs.find(j => j._id === jobId);
+            setJob(found);
         } catch (err) {
             console.log("job load error:", err);
         }
@@ -42,25 +42,30 @@ const JobDetailsPage = () => {
             </>
         );
 
-    const { title, jobRequirements, jobCreatedBy } = job;
+    const { title, jobRequirements } = job;
+
     const hasApplied = job.applications?.includes(user?._id);
 
+    const applyJob = async () => {
+        const token = localStorage.getItem("token");
 
-
-    const applyNow = async () => {
-        const token = localStorage.getItem("token");  // <-- FIXED
-        if (!token) return triggerMessage("warning", "Please login as a user first!");
+        if (!token) {
+            return triggerMessage("warning", "Please login to apply!");
+        }
 
         try {
-            await applyForJob(token, job._id);
-            setJob((prev) => ({
-                ...prev,
-                applications: [...prev.applications, user._id]
-            }));
+            const res = await applyForJob(token, job._id);
 
-            triggerMessage("success", "Applied Successfully!");
+            if (res.status === 202) {
+                triggerMessage("success", "Applied successfully!");
+
+                setJob(prev => ({
+                    ...prev,
+                    applications: [...prev.applications, user._id]
+                }));
+            }
         } catch (err) {
-            triggerMessage("danger", err?.response?.data?.message || "Fail to apply");
+            triggerMessage("danger", err?.response?.data?.message || "Unable to apply");
         }
     };
 
@@ -71,6 +76,7 @@ const JobDetailsPage = () => {
             <div className="max-w-4xl mx-auto p-6 bg-white mt-6 shadow rounded">
                 <h1 className="text-3xl font-bold mb-3">{title}</h1>
 
+                {/* Company Logo */}
                 {job.jobCreatedBy?.companyLogo && (
                     <img
                         src={`${import.meta.env.VITE_BASE_API_URL}/uploads/company_logos/${job.jobCreatedBy.companyLogo}`}
@@ -79,12 +85,11 @@ const JobDetailsPage = () => {
                     />
                 )}
 
-
                 {/* Company Name */}
                 <p className="text-gray-700 text-lg mb-2">
-                    <strong>Company:</strong> {job.jobCreatedBy?.companyDetails?.name}
+                    <strong>Company:</strong>{" "}
+                    {job.jobCreatedBy?.companyDetails?.name || "Unknown"}
                 </p>
-
 
                 {/* Posted Date */}
                 <p className="text-gray-600 mb-4">
@@ -101,21 +106,11 @@ const JobDetailsPage = () => {
                 <h2 className="text-xl font-semibold mb-2">Job Requirements</h2>
 
                 <div className="space-y-2">
-                    <p>
-                        <strong>Job Type:</strong> {jobRequirements.type}
-                    </p>
-                    <p>
-                        <strong>Category:</strong> {jobRequirements.category}
-                    </p>
-                    <p>
-                        <strong>Experience:</strong> {jobRequirements.exprience}
-                    </p>
-                    <p>
-                        <strong>Location:</strong> {jobRequirements.location}
-                    </p>
-                    <p>
-                        <strong>Salary Offered:</strong> ₹{jobRequirements.offeredSalary}
-                    </p>
+                    <p><strong>Job Type:</strong> {jobRequirements.type}</p>
+                    <p><strong>Category:</strong> {jobRequirements.category}</p>
+                    <p><strong>Experience:</strong> {jobRequirements.exprience}</p>
+                    <p><strong>Location:</strong> {jobRequirements.location}</p>
+                    <p><strong>Salary:</strong> ₹{jobRequirements.offeredSalary}</p>
                 </div>
 
                 <hr className="my-4" />
@@ -131,21 +126,28 @@ const JobDetailsPage = () => {
                     <strong>Applicants:</strong> {job.applications?.length || 0}
                 </p>
 
-
-                <button
-                    onClick={applyNow}
-                    disabled={hasApplied}
-                    className={`px-4 py-2 rounded mt-4 text-white
-                        ${hasApplied ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}`}
-                >
-                    {hasApplied ? "Already Applied" : "Apply Now"}
-                </button>
-
-
+                {/* Apply button */}
+                {!job.closed ? (
+                    <button
+                        disabled={hasApplied}
+                        onClick={!hasApplied ? applyJob : null}
+                        className={`mt-4 px-4 py-2 rounded text-white 
+                        ${hasApplied ? "bg-gray-400 cursor-not-allowed" : "cursor-pointer bg-blue-600"}`}
+                    >
+                        {hasApplied ? "Already Applied" : "Apply Now"}
+                    </button>
+                ) : (
+                    <button
+                        className="mt-4 bg-red-500 text-white px-4 py-2 rounded cursor-not-allowed"
+                        disabled
+                    >
+                        Job Closed
+                    </button>
+                )}
 
                 <Link
                     to="/"
-                    className="bg-blue-600 text-white px-4 py-2 rounded inline-block"
+                    className="ml-3 bg-gray-700 text-white px-4 py-2 rounded inline-block"
                 >
                     Back to Jobs
                 </Link>

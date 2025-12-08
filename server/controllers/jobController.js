@@ -2,153 +2,106 @@ import { companyModel } from "../models/companySchema.js";
 import { jobModel } from "../models/jobSchema.js";
 import { userModel } from "../models/userSchema.js";
 
-// create a job
-// const createJob = async (req, res) => {
-//     try {
-
-//         let company = req.company
-
-//         if (!company) throw ("Invalid request. Please register/login first !")
-
-//         let { title, jobRequirements } = req.body
-
-//         if (!title || !jobRequirements) throw ("invalid or missing data to create job !");
-
-//         let { type, category, exprience, location, postDate, offeredSalary, description } = jobRequirements
-
-//         if (!type || !category || !exprience || !location || !postDate || !offeredSalary || !description) throw ("jobRequirements data is not valid !")
-
-//         let newJob = new jobModel({ title, jobCreatedBy: company._id, jobRequirements })
-
-//         let result = await newJob.save()
-
-//         // add job id to company data [createdJobs]
-//         console.log(result)
-
-//         let updateCompany = companyModel.findByIdAndUpdate(company._id, { $push: { "createdJobs": result.insertedId } })
-
-//         if (updateCompany.modifiedCount == 0) throw ("unable to store job in company data !")
-
-//         res.status(202).json({ message: "new job created successfully !" })
-
-//     } catch (err) {
-//         console.log(err)
-//         res.status(400).json({ message: "unable to add job !", err })
-//     }
-// }
-
-// actions a job
-const handleJobAction = async (req, res) => {
-  try {
-
-    let company = req.company
-
-    if (!company) throw ("Invalid request. Please register/login first !")
-
-    let { jobId } = req.params
-
-    let { action } = req.params
-
-    if (action == "delete") {
-      let result = await jobModel.findByIdAndDelete(jobId)
-      if (!result) throw ("unable to delete the job")
-      // remove this job id from user data
-      res.status(202).json({ message: "successfully delete the job !" })
-    } else if (action == "close") {
-      let result = await jobModel.findByIdAndUpdate(jobId, { $set: { "closed": true } })
-      if (result.modifiedCount == 0) throw ("unable to close a job !")
-      res.status(202).json({ message: "successfully closed the job !" })
-    }
-
-  } catch (err) {
-    console.log(err)
-    res.status(400).json({ message: "unable to delete a job !", err })
-  }
-}
-
-// handle job application
-const handleJobApplication = async (req, res) => {
-  try {
-
-    let user = req.user
-
-    if (!user) throw ("user not loged In !")
-
-    let { jobId } = req.params
-
-    if (!jobId) throw ("job id is invalid !")
-
-    // search for job usign id get job details check if closed is true if it is then not to apply for the job
-
-    let updateJob = await jobModel.findByIdAndUpdate(jobId, { $push: { "applications": user._id } })
-
-    let updateUser = await userModel.findByIdAndUpdate(user._id, { $push: { "appliedJobs": jobId } })
-
-    if (updateJob.modifiedCount == 0) throw ("unable to apply for a job !")
-
-    if (updateUser.modifiedCount == 0) throw ("unable to apply for a job !")
-
-    res.status(202).json({ message: "applied for job successfully !" })
-
-  } catch (err) {
-    console.log("unable to apply for a job :", err)
-    res.status(400).json({ message: "unable to apply for this job !", err })
-  }
-}
-
-// get job details(filters)
-
-
-
 const createJob = async (req, res) => {
   try {
-    let company = req.company;
-    if (!company) throw "Invalid request. Please register/login first !";
+    const company = req.company;
+    if (!company)
+      return res.status(401).json({ message: "Login as company first" });
 
-    let { title, jobRequirements } = req.body;
-    if (!title || !jobRequirements) throw "invalid or missing data to create job !";
+    const { title, jobRequirements } = req.body;
+    if (!title || !jobRequirements)
+      return res.status(400).json({ message: "Missing job data" });
 
-    let { type, category, exprience, location, postDate, offeredSalary, description } =
+    const { type, category, exprience, location, offeredSalary, description } =
       jobRequirements;
 
     if (!type || !category || !exprience || !location || !offeredSalary || !description)
-      throw "jobRequirements data is not valid !";
+      return res.status(400).json({ message: "Invalid job requirements" });
 
-    let newJob = new jobModel({
+    const newJob = new jobModel({
       title,
       jobCreatedBy: company._id,
       jobRequirements,
     });
 
-    let result = await newJob.save();
-
-    // store job id inside company.createJobs (matches your schema)
+    const result = await newJob.save();
     await companyModel.findByIdAndUpdate(company._id, {
       $push: { createJobs: result._id },
     });
 
-    res.status(202).json({ message: "new job created successfully !" });
+    res.status(202).json({ message: "Job created successfully!" });
   } catch (err) {
-    console.log("job creation error:", err);
-    res.status(400).json({ message: "unable to add job !", err });
+    console.log("Job creation error:", err);
+    res.status(500).json({ message: "Unable to create job", err });
+  }
+};
+
+const handleJobAction = async (req, res) => {
+  try {
+    const company = req.company;
+    if (!company)
+      return res.status(401).json({ message: "Login as company first" });
+
+    const { jobId, action } = req.params;
+
+    if (action === "delete") {
+      await jobModel.findByIdAndDelete(jobId);
+      return res.status(202).json({ message: "Job deleted!" });
+    }
+
+    if (action === "close") {
+      await jobModel.findByIdAndUpdate(jobId, { $set: { closed: true } });
+      return res.status(202).json({ message: "Job closed!" });
+    }
+
+    return res.status(400).json({ message: "Invalid job action!" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Job action failed", err });
+  }
+};
+
+const handleJobApplication = async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ message: "Please login first" });
+
+    const { jobId } = req.params;
+
+    const job = await jobModel.findById(jobId);
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    if (job.closed)
+      return res.status(400).json({ message: "This job is closed" });
+    if (job.applications.includes(user._id))
+      return res.status(400).json({ message: "You already applied for this job" });
+
+    await jobModel.findByIdAndUpdate(jobId, {
+      $push: { applications: user._id }
+    });
+
+    await userModel.findByIdAndUpdate(user._id, {
+      $push: { appliedJobs: jobId }
+    });
+
+    res.status(202).json({ message: "Applied successfully!" });
+  } catch (err) {
+    console.log("error applying:", err);
+    res.status(500).json({ message: "Unable to apply", err });
   }
 };
 
 const getJobData = async (req, res) => {
   try {
-    let jobData = await jobModel
+    const jobData = await jobModel
       .find({})
-      .populate("jobCreatedBy", "companyDetails name companyLogo");  // <-- FIX
+      .populate("jobCreatedBy", "companyDetails name companyLogo");
 
-    res.status(200).json({ message: "got job/s data !", jobData });
+    res.status(200).json({ message: "jobs loaded", jobData });
   } catch (err) {
-    console.log("unable to get job data : ", err);
-    res.status(500).json({ message: "unable to send jobs data at this moment !", err });
+    console.log("get jobs err:", err);
+    res.status(500).json({ message: "Unable to load jobs", err });
   }
 };
 
-
-
-
-
-export { createJob, handleJobAction, handleJobApplication, getJobData }
+export { createJob, handleJobAction, handleJobApplication, getJobData };

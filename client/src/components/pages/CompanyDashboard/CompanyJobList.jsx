@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getCompanyJobs, deleteCompanyJob } from "../../../api/companyAPI.js";
+import { getCompanyJobs, deleteCompanyJob, closeCompanyJob } from "../../../api/companyAPI.js";
 import { useMessage } from "../../../context/messageContext.jsx";
 
 const CompanyJobList = () => {
@@ -23,8 +23,9 @@ const CompanyJobList = () => {
         loadJobs();
     }, []);
 
+    // DELETE JOB
     const handleDelete = async (jobId) => {
-        if (!confirm("Delete this job?")) return;
+        if (!confirm("Delete this job permanently?")) return;
 
         try {
             let res = await deleteCompanyJob(token, jobId);
@@ -34,6 +35,21 @@ const CompanyJobList = () => {
             }
         } catch (err) {
             triggerMessage("danger", "Delete failed");
+        }
+    };
+
+    // CLOSE JOB
+    const handleCloseJob = async (jobId) => {
+        if (!confirm("Close this job? Users will not be able to apply.")) return;
+
+        try {
+            const res = await closeCompanyJob(token, jobId);
+            if (res.status === 202) {
+                triggerMessage("success", "Job closed successfully");
+                loadJobs();
+            }
+        } catch (err) {
+            triggerMessage("danger", "Unable to close job");
         }
     };
 
@@ -47,13 +63,28 @@ const CompanyJobList = () => {
                 <div className="space-y-4">
                     {jobs.map(job => {
                         const jr = job.jobRequirements;
+
                         return (
                             <div key={job._id} className="p-4 border rounded flex justify-between items-start">
+
+                                {/* LEFT SIDE — JOB DETAILS */}
                                 <div>
                                     <h4 className="font-bold text-lg">{job.title}</h4>
+
+                                    {/* job status */}
+                                    <p className="mt-1">
+                                        Status:{" "}
+                                        {job.closed ? (
+                                            <span className="text-red-600 font-semibold">Closed</span>
+                                        ) : (
+                                            <span className="text-green-600 font-semibold">Open</span>
+                                        )}
+                                    </p>
+
                                     <p className="">{jr.category} • {jr.type} • {jr.exprience}</p>
-                                    <p className=" mt-1">{jr.location}</p>
+                                    <p className="mt-1">{jr.location}</p>
                                     <p className="">₹ {jr.offeredSalary}</p>
+
                                     <p>
                                         Posted on: {new Date(job.jobRequirements.postDate).toLocaleString('en-IN', {
                                             day: '2-digit',
@@ -63,12 +94,35 @@ const CompanyJobList = () => {
                                     </p>
                                 </div>
 
-                                <button
-                                    onClick={() => handleDelete(job._id)}
-                                    className="text-red-500 hover:underline"
-                                >
-                                    Delete
-                                </button>
+                                {/* RIGHT SIDE — ACTION BUTTONS */}
+                                <div className="flex flex-col gap-2 items-end">
+
+                                    {/* CLOSE JOB BUTTON (only if open) */}
+                                    {!job.closed && (
+                                        <button
+                                            onClick={() => handleCloseJob(job._id)}
+                                            className="px-3 py-1 bg-orange-500 text-white rounded"
+                                        >
+                                            Close Job
+                                        </button>
+                                    )}
+
+                                    {/* CLOSED BADGE */}
+                                    {job.closed && (
+                                        <span className="px-3 py-1 bg-gray-400 text-white rounded">
+                                            Closed
+                                        </span>
+                                    )}
+
+                                    {/* DELETE BUTTON */}
+                                    <button
+                                        onClick={() => handleDelete(job._id)}
+                                        className="px-3 py-1 bg-red-500 text-white rounded"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+
                             </div>
                         );
                     })}

@@ -9,3 +9,16 @@ export const createCompanyJob = async (token, payload) => {
     }
   );
 };
+
+
+// user applies for a job
+export const applyForJobAPI = async (token, jobId) => {
+  return await axios.post(
+    `${import.meta.env.VITE_BASE_API_URL}/job/apply/${jobId}`,
+    {},
+    {
+      headers: { authorization: token }
+    }
+  );
+};
+

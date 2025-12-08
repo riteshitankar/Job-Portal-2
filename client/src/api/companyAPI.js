@@ -180,3 +180,13 @@ export const getCompanyJobs = async (token) => {
   );
 };
 
+// close company job
+export const closeCompanyJob = async (token, jobId) => {
+  return await axios.post(
+    `${import.meta.env.VITE_BASE_API_URL}/job/action/close/${jobId}`,
+    {},
+    {
+      headers: { authorization: token }
+    }
+  );
+};
