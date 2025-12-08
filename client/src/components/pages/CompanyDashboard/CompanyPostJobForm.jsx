@@ -20,14 +20,21 @@ const CompanyPostJobForm = ({ onPosted }) => {
             offeredSalary: "",
             description: "",
         },
-        maxApplications: 0
+        maxApplications: ""
     });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
         if (name.includes("jobRequirements.")) {
             const key = name.split(".")[1];
-            setForm(prev => ({ ...prev, jobRequirements: { ...prev.jobRequirements, [key]: value } }));
+            setForm(prev => ({
+                ...prev,
+                jobRequirements: {
+                    ...prev.jobRequirements,
+                    [key]: value
+                }
+            }));
         } else {
             setForm(prev => ({ ...prev, [name]: value }));
         }
@@ -41,22 +48,16 @@ const CompanyPostJobForm = ({ onPosted }) => {
             const token = localStorage.getItem("company_token");
             if (!token) throw new Error("Not authenticated");
 
-            // Build payload exactly as backend expects
+            // Build correct payload
             const payload = {
-                title: form.title.trim(),
+                title: form.title,
                 jobRequirements: {
-                    type: form.jobRequirements.type.trim(),
-                    category: form.jobRequirements.category.trim(),
-                    exprience: form.jobRequirements.exprience.trim(),
-                    location: form.jobRequirements.location.trim(),
-                    description: form.jobRequirements.description.trim(),
-                    offeredSalary: Number(form.jobRequirements.offeredSalary),
-                    postDate: new Date()
-                },
-                maxApplications: Number(form.maxApplications || 0)
+                    ...form.jobRequirements,
+                    postDate: new Date(),
+                    maxApplications: Number(form.maxApplications)
+                }
             };
 
-            // Send to backend
             const res = await createCompanyJob(token, payload);
 
             if (res.status === 202) {
@@ -73,17 +74,15 @@ const CompanyPostJobForm = ({ onPosted }) => {
                         offeredSalary: "",
                         description: ""
                     },
-                    maxApplications: 0
+                    maxApplications: ""
                 });
 
-                // Close form
                 setOpen(false);
-
-                // Refresh profile
                 await fetchCompanyProfile();
 
                 if (onPosted) onPosted();
             }
+
         } catch (err) {
             console.log("post job err:", err);
             triggerMessage(
@@ -107,52 +106,108 @@ const CompanyPostJobForm = ({ onPosted }) => {
             {open && (
                 <form onSubmit={submit} className="mt-4 bg-white p-4 rounded shadow">
                     <div className="grid grid-cols-2 gap-4">
+
                         <div>
                             <label className="opacity-70">Job Title</label>
-                            <input name="title" value={form.title} onChange={handleChange} required className="mt-2 w-full p-2 border rounded" />
+                            <input
+                                name="title"
+                                value={form.title}
+                                onChange={handleChange}
+                                required
+                                className="mt-2 w-full p-2 border rounded"
+                            />
                         </div>
 
                         <div>
                             <label className="opacity-70">Job Type</label>
-                            <input name="jobRequirements.type" value={form.jobRequirements.type} onChange={handleChange} required className="mt-2 w-full p-2 border rounded" />
+                            <input
+                                name="jobRequirements.type"
+                                value={form.jobRequirements.type}
+                                onChange={handleChange}
+                                required
+                                className="mt-2 w-full p-2 border rounded"
+                            />
                         </div>
 
                         <div>
                             <label className="opacity-70">Category</label>
-                            <input name="jobRequirements.category" value={form.jobRequirements.category} onChange={handleChange} required className="mt-2 w-full p-2 border rounded" />
+                            <input
+                                name="jobRequirements.category"
+                                value={form.jobRequirements.category}
+                                onChange={handleChange}
+                                required
+                                className="mt-2 w-full p-2 border rounded"
+                            />
                         </div>
 
                         <div>
                             <label className="opacity-70">Experience</label>
-                            <input name="jobRequirements.exprience" value={form.jobRequirements.exprience} onChange={handleChange} required className="mt-2 w-full p-2 border rounded" />
+                            <input
+                                name="jobRequirements.exprience"
+                                value={form.jobRequirements.exprience}
+                                onChange={handleChange}
+                                required
+                                className="mt-2 w-full p-2 border rounded"
+                            />
                         </div>
 
                         <div>
                             <label className="opacity-70">Location</label>
-                            <input name="jobRequirements.location" value={form.jobRequirements.location} onChange={handleChange} required className="mt-2 w-full p-2 border rounded" />
+                            <input
+                                name="jobRequirements.location"
+                                value={form.jobRequirements.location}
+                                onChange={handleChange}
+                                required
+                                className="mt-2 w-full p-2 border rounded"
+                            />
                         </div>
 
                         <div>
                             <label className="opacity-70">Offered Salary</label>
-                            <input name="jobRequirements.offeredSalary" value={form.jobRequirements.offeredSalary} onChange={handleChange} required type="number" className="mt-2 w-full p-2 border rounded" />
+                            <input
+                                name="jobRequirements.offeredSalary"
+                                type="number"
+                                value={form.jobRequirements.offeredSalary}
+                                onChange={handleChange}
+                                required
+                                className="mt-2 w-full p-2 border rounded"
+                            />
                         </div>
 
                         <div className="col-span-2">
                             <label className="opacity-70">Description</label>
-                            <textarea name="jobRequirements.description" value={form.jobRequirements.description} onChange={handleChange} rows="5" required className="mt-2 w-full p-2 border rounded" />
+                            <textarea
+                                name="jobRequirements.description"
+                                value={form.jobRequirements.description}
+                                onChange={handleChange}
+                                rows="5"
+                                required
+                                className="mt-2 w-full p-2 border rounded"
+                            />
                         </div>
 
                         <div>
                             <label className="opacity-70">Max Applications</label>
-                            <input name="maxApplications" value={form.maxApplications} onChange={handleChange} type="number" min="0" className="mt-2 w-full p-2 border rounded" />
+                            <input
+                                name="maxApplications"
+                                type="number"
+                                min="0"
+                                value={form.maxApplications}
+                                onChange={handleChange}
+                                className="mt-2 w-full p-2 border rounded"
+                                required
+                            />
                         </div>
+
                     </div>
 
                     <div className="mt-4 flex gap-2">
                         <button type="submit" disabled={loading} className="bg-green-600 text-white px-4 py-2 rounded">
                             {loading ? "Posting..." : "Post Job"}
                         </button>
-                        <button type="button" onClick={() => setOpen(false)} className="bg-gray-300 px-4 py-2 rounded">Cancel</button>
+                        <button type="button" onClick={() => setOpen(false)} className="bg-gray-300 px-4 py-2 rounded">
+                            Cancel
+                        </button>
                     </div>
                 </form>
             )}

@@ -127,23 +127,38 @@ const JobDetailsPage = () => {
                 </p>
 
                 {/* Apply button */}
-                {!job.closed ? (
+                {/* Apply Button */}
+                {job.closed ? (
                     <button
-                        disabled={hasApplied}
-                        onClick={!hasApplied ? applyJob : null}
-                        className={`mt-4 px-4 py-2 rounded text-white 
-                        ${hasApplied ? "bg-gray-400 cursor-not-allowed" : "cursor-pointer bg-blue-600"}`}
-                    >
-                        {hasApplied ? "Already Applied" : "Apply Now"}
-                    </button>
-                ) : (
-                    <button
-                        className="mt-4 bg-red-500 text-white px-4 py-2 rounded cursor-not-allowed"
+                        className="bg-red-500 text-white px-4 py-2 rounded cursor-not-allowed"
                         disabled
                     >
                         Job Closed
                     </button>
+                ) : hasApplied ? (
+                    <button
+                        className="bg-gray-400 text-white px-4 py-2 rounded cursor-not-allowed"
+                        disabled
+                    >
+                        Already Applied
+                    </button>
+                ) : job.applications.length >= job.maxApplications ? (
+                    <button
+                        className="bg-orange-500 text-white px-4 py-2 rounded cursor-not-allowed"
+                        disabled
+                    >
+                        Application Limit Reached
+                    </button>
+                ) : (
+                    <button
+                        onClick={applyJob}
+                        className="bg-blue-600 text-white px-4 py-2 rounded"
+                    >
+                        Apply Now
+                    </button>
                 )}
+
+
 
                 <Link
                     to="/"

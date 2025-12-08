@@ -128,10 +128,6 @@ export const getAllJobs = async () => {
   }
 };
 
-
-
-
-
 // Get all jobs (public)
 export const getAllJobsAPI = async () => {
   return await axios.get(`${BASE}/job/get-jobs`);

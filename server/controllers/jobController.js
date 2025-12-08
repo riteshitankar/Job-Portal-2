@@ -18,11 +18,13 @@ const createJob = async (req, res) => {
     if (!type || !category || !exprience || !location || !offeredSalary || !description)
       return res.status(400).json({ message: "Invalid job requirements" });
 
-    const newJob = new jobModel({
+    let newJob = new jobModel({
       title,
       jobCreatedBy: company._id,
       jobRequirements,
+      maxApplications: jobRequirements.maxApplications,
     });
+
 
     const result = await newJob.save();
     await companyModel.findByIdAndUpdate(company._id, {
@@ -63,18 +65,30 @@ const handleJobAction = async (req, res) => {
 
 const handleJobApplication = async (req, res) => {
   try {
-    const user = req.user;
-    if (!user) return res.status(401).json({ message: "Please login first" });
+    let user = req.user;
+    if (!user) throw "User not logged in!";
 
-    const { jobId } = req.params;
+    let { jobId } = req.params;
 
-    const job = await jobModel.findById(jobId);
-    if (!job) return res.status(404).json({ message: "Job not found" });
+    let job = await jobModel.findById(jobId);
+    if (!job) throw "Job not found!";
 
-    if (job.closed)
-      return res.status(400).json({ message: "This job is closed" });
-    if (job.applications.includes(user._id))
-      return res.status(400).json({ message: "You already applied for this job" });
+    if (job.closed) {
+      return res.status(400).json({ message: "This job is already closed!" });
+    }
+
+    if (job.applications.includes(user._id)) {
+      return res.status(400).json({ message: "You have already applied!" });
+    }
+
+    if (job.applications.length >= job.maxApplications) {
+      // auto close job 
+      await jobModel.findByIdAndUpdate(jobId, { closed: true });
+
+      return res
+        .status(400)
+        .json({ message: "Application limit reached. Job is now closed!" });
+    }
 
     await jobModel.findByIdAndUpdate(jobId, {
       $push: { applications: user._id }
@@ -84,12 +98,14 @@ const handleJobApplication = async (req, res) => {
       $push: { appliedJobs: jobId }
     });
 
-    res.status(202).json({ message: "Applied successfully!" });
+    res.status(202).json({ message: "Applied for job successfully!" });
+
   } catch (err) {
-    console.log("error applying:", err);
-    res.status(500).json({ message: "Unable to apply", err });
+    console.log("Apply job error:", err);
+    res.status(400).json({ message: err.toString() });
   }
 };
+
 
 const getJobData = async (req, res) => {
   try {
