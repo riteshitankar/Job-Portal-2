@@ -27,23 +27,23 @@ const CompanyApplicantsPage = () => {
     };
 
     const updateStatus = async (userId, status) => {
-  try {
-    await axios.put(
-      `http://localhost:5000/job/applicants/${jobId}/update`,
-      { userId, status },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+        try {
+            await axios.put(
+                `http://localhost:5000/job/applicants/${jobId}/update`,
+                { userId, status },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
 
-    setApplicants(prev =>
-      prev.map(a =>
-        a._id === userId ? { ...a, status } : a
-      )
-    );
+            setApplicants(prev =>
+                prev.map(a =>
+                    a._id === userId ? { ...a, status } : a
+                )
+            );
 
-  } catch (err) {
-    console.log("Update status error:", err);
-  }
-};
+        } catch (err) {
+            console.log("Update status error:", err);
+        }
+    };
 
 
     return (
@@ -78,37 +78,37 @@ const CompanyApplicantsPage = () => {
                             </td>
                             <td className="p-2 border">
 
-  <span className={`px-3 py-1 rounded text-white 
+                                <span className={`px-3 py-1 rounded text-white 
     ${u.status === "accepted" ? "bg-green-600" :
-     u.status === "rejected" ? "bg-red-600" :
-     "bg-gray-500"}`}>
-    {u.status}
-  </span>
+                                        u.status === "rejected" ? "bg-red-600" :
+                                            "bg-gray-500"}`}>
+                                    {u.status}
+                                </span>
 
-  {/* Accept / Reject Buttons */}
-  <div className="flex gap-2 mt-2">
+                                {/* Accept / Reject Buttons */}
+                                <div className="flex gap-2 mt-2">
 
-    <button
-      disabled={u.status !== "pending"}
-      onClick={() => updateStatus(u._id, "accepted")}
-      className={`px-3 py-1 rounded text-white
+                                    <button
+                                        disabled={u.status !== "pending"}
+                                        onClick={() => updateStatus(u._id, "accepted")}
+                                        className={`px-3 py-1 rounded text-white
         ${u.status !== "pending" ? "bg-gray-400 cursor-not-allowed" : "bg-green-600"}`}
-    >
-      Accept
-    </button>
+                                    >
+                                        Accept
+                                    </button>
 
-    <button
-      disabled={u.status !== "pending"}
-      onClick={() => updateStatus(u._id, "rejected")}
-      className={`px-3 py-1 rounded text-white
+                                    <button
+                                        disabled={u.status !== "pending"}
+                                        onClick={() => updateStatus(u._id, "rejected")}
+                                        className={`px-3 py-1 rounded text-white
         ${u.status !== "pending" ? "bg-gray-400 cursor-not-allowed" : "bg-red-600"}`}
-    >
-      Reject
-    </button>
+                                    >
+                                        Reject
+                                    </button>
 
-  </div>
+                                </div>
 
-</td>
+                            </td>
 
 
 

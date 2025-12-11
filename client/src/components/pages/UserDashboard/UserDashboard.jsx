@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { requestUserProfile } from '../../../api/userAPI'
 import Header from '../../sections/includes/Header.jsx'
 import Footer from '../../sections/includes/Footer.jsx'
+// import JobTracker from './UserActions/JobTracker.jsx'
 
 import "./userDashboard.scss"
 

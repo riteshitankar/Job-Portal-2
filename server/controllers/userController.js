@@ -6,6 +6,8 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import fs from 'fs';
 import path from 'path';
+import { jobModel } from "../models/jobSchema.js";
+
 dotenv.config({ path: "./config.env" })
 
 // to send a email we need a transporter 
@@ -386,34 +388,77 @@ const deleteResume = async (req, res) => {
 };
 
 
-
 const getUserAppliedJobs = async (req, res) => {
   try {
-    const user = req.user;
+    const userId = req.user._id;
 
-    const userData = await userModel
-      .findById(user._id)
-      .populate("appliedJobs");
+    const user = await userModel.findById(userId);
 
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Load all applied jobs
     const jobs = await Promise.all(
-      userData.appliedJobs.map(async (job) => {
-        const status = job.applicantStatus?.[user._id] || "pending";
+      user.appliedJobs.map(async (jobId) => {
+        const job = await jobModel
+          .findById(jobId)
+          .populate("jobCreatedBy", "companyDetails.name");
+
+        if (!job) return null;
+
+        const status = job.applicantStatus?.[userId] || "pending";
 
         return {
           jobId: job._id,
           title: job.title,
-          company: job.jobCreatedBy,
+          company: job.jobCreatedBy?.companyDetails?.name || "Unknown",
           status
         };
       })
     );
 
-    res.json({ jobs });
+    res.json({ jobs: jobs.filter(Boolean) });
 
   } catch (err) {
+    console.log("Error loading applied jobs:", err);
+    res.status(500).json({ message: "Failed to load applied jobs", err });
+  }
+};
+
+
+const getAppliedJobs = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const jobs = await jobModel
+      .find({ applications: userId })
+      .select("title applicantStatus jobCreatedBy")
+      .populate("jobCreatedBy", "companyDetails.name");
+
+    const formatted = jobs.map(job => {
+      const status =
+        job.applicantStatus && job.applicantStatus[userId]
+          ? job.applicantStatus[userId]
+          : "pending";
+
+      return {
+        jobId: job._id,
+        title: job.title,
+        company: job.jobCreatedBy.companyDetails.name,
+        status
+      };
+    });
+
+    res.status(200).json({ jobs: formatted });
+
+  } catch (err) {
+    console.log("get applied jobs error:", err);
     res.status(500).json({ message: "Failed to load applied jobs" });
   }
 };
 
 
-export { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile, getUserAppliedJobs }
+
+
+export { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile, getUserAppliedJobs, getAppliedJobs }

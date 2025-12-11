@@ -21,6 +21,8 @@ import Message from './components/sections/actions/Message.jsx';
 import JobDetailsPage from "./components/pages/JobDetailsPage.jsx";
 import CompanyApplicantsPage from "./components/pages/CompanyDashboard/CompanyApplicantsPage";
 
+import JobTracker from './components/pages/UserDashboard/UserActions/JobTracker.jsx';
+
 const App = () => {
   return (
     <>
@@ -44,6 +46,14 @@ const App = () => {
                 <Route path="/job/:jobId" element={<JobDetailsPage />} />
 
                 <Route path="/company/applicants/:jobId" element={<CompanyApplicantsPage />} />
+
+                {/* User routes */}
+                {/* <Route path='/user-login-register' element={<UserLoginRegister />} />
+                <Route path='/user/dashboard' element={<UserDashboard />} /> */}
+
+
+
+                <Route path="/user/dashboard/tracker" element={<JobTracker />} />
 
 
               </Routes>

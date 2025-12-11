@@ -1,8 +1,9 @@
 import express from "express"
-import { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile, getUserAppliedJobs  } from "../controllers/userController.js"
+import { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile  } from "../controllers/userController.js"
 import { AuthUser } from "../middlewares/AuthUser.js"
 import upload from "../config/multerConfig.js"
 import profilePicUpload from "../config/multerProfilePic.js";
+import { getUserAppliedJobs } from "../controllers/userController.js";
 
 
 let userRouter = express.Router()
