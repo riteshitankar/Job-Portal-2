@@ -169,39 +169,41 @@ const getApplicants = async (req, res) => {
 
     if (!job) return res.status(404).json({ message: "Job not found" });
 
-    res.status(200).json({
-      job: {
-        title: job.title,
-        jobCreatedBy: job.jobCreatedBy,
-        jobRequirements: job.jobRequirements
-      },
-      applicants: job.applications
-    });
+    // Attach status for each applicant
+    const applicants = job.applications.map((u) => ({
+      _id: u._id,
+      name: u.name,
+      phone: u.phone,
+      email: u.email.userEmail,  // FIX
+      status: job.applicantStatus?.[u._id] || "pending"
+    }));
 
+    res.status(200).json({ job, applicants });
   } catch (err) {
-    console.log("get applicants error:", err);
     res.status(500).json({ message: "Failed to load applicants", err });
   }
 };
 
-
 const updateApplicantStatus = async (req, res) => {
   try {
     const { jobId } = req.params;
-    const { userId, status } = req.body;
+    const { userId, status } = req.body; // accepted or rejected
+
+    if (!["accepted", "rejected"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
 
     await jobModel.findByIdAndUpdate(
       jobId,
       { $set: { [`applicantStatus.${userId}`]: status } }
     );
 
-    res.json({ message: "Applicant status updated!" });
-
+    res.status(200).json({ message: "Status updated", status });
   } catch (err) {
-    console.log(err);
     res.status(500).json({ message: "Failed to update status" });
   }
 };
+
 
 
 export { createJob, handleJobAction, handleJobApplication, getJobData, editJob, getApplicants, updateApplicantStatus };

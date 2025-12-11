@@ -58,11 +58,15 @@ const jobSchema = mongoose.Schema({
         type: Number,
         required: true
     },
+    applicantStatus: {
+        type: Object,
+        default: {}
+    },
     timeStamp: {
         type: Date,
         default: Date.now()
     }
-    
+
 })
 
 let jobModel = new mongoose.model("jobs", jobSchema)

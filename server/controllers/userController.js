@@ -386,4 +386,34 @@ const deleteResume = async (req, res) => {
 };
 
 
-export { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile }
+
+const getUserAppliedJobs = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const userData = await userModel
+      .findById(user._id)
+      .populate("appliedJobs");
+
+    const jobs = await Promise.all(
+      userData.appliedJobs.map(async (job) => {
+        const status = job.applicantStatus?.[user._id] || "pending";
+
+        return {
+          jobId: job._id,
+          title: job.title,
+          company: job.jobCreatedBy,
+          status
+        };
+      })
+    );
+
+    res.json({ jobs });
+
+  } catch (err) {
+    res.status(500).json({ message: "Failed to load applied jobs" });
+  }
+};
+
+
+export { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile, getUserAppliedJobs }

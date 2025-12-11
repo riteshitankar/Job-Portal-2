@@ -1,5 +1,5 @@
 import express from "express"
-import { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile  } from "../controllers/userController.js"
+import { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile, getUserAppliedJobs  } from "../controllers/userController.js"
 import { AuthUser } from "../middlewares/AuthUser.js"
 import upload from "../config/multerConfig.js"
 import profilePicUpload from "../config/multerProfilePic.js";
@@ -42,5 +42,6 @@ userRouter.patch("/update-bio", AuthUser, updateUserBio);
 
 userRouter.post("/upload-resume", AuthUser, upload, uploadResume);
 userRouter.delete("/delete-resume", AuthUser, deleteResume);
+userRouter.get("/applied-jobs", AuthUser, getUserAppliedJobs);
 
 export { userRouter }

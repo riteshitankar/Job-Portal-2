@@ -16,6 +16,7 @@ const JobModal = ({ closeModal }) => {
     location: "",
     offeredSalary: "",
     description: "",
+    
   });
 
   const handleChange = (e) => {

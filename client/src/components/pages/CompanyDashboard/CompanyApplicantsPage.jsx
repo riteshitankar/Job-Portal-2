@@ -26,6 +26,26 @@ const CompanyApplicantsPage = () => {
         }
     };
 
+    const updateStatus = async (userId, status) => {
+  try {
+    await axios.put(
+      `http://localhost:5000/job/applicants/${jobId}/update`,
+      { userId, status },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    setApplicants(prev =>
+      prev.map(a =>
+        a._id === userId ? { ...a, status } : a
+      )
+    );
+
+  } catch (err) {
+    console.log("Update status error:", err);
+  }
+};
+
+
     return (
         <div className="p-6">
 
@@ -57,12 +77,41 @@ const CompanyApplicantsPage = () => {
                                 {u.email?.userEmail || "N/A"}
                             </td>
                             <td className="p-2 border">
-                                <select className="border p-1 rounded">
-                                    <option value="pending">Pending</option>
-                                    <option value="accepted">Accept</option>
-                                    <option value="rejected">Reject</option>
-                                </select>
-                            </td>
+
+  <span className={`px-3 py-1 rounded text-white 
+    ${u.status === "accepted" ? "bg-green-600" :
+     u.status === "rejected" ? "bg-red-600" :
+     "bg-gray-500"}`}>
+    {u.status}
+  </span>
+
+  {/* Accept / Reject Buttons */}
+  <div className="flex gap-2 mt-2">
+
+    <button
+      disabled={u.status !== "pending"}
+      onClick={() => updateStatus(u._id, "accepted")}
+      className={`px-3 py-1 rounded text-white
+        ${u.status !== "pending" ? "bg-gray-400 cursor-not-allowed" : "bg-green-600"}`}
+    >
+      Accept
+    </button>
+
+    <button
+      disabled={u.status !== "pending"}
+      onClick={() => updateStatus(u._id, "rejected")}
+      className={`px-3 py-1 rounded text-white
+        ${u.status !== "pending" ? "bg-gray-400 cursor-not-allowed" : "bg-red-600"}`}
+    >
+      Reject
+    </button>
+
+  </div>
+
+</td>
+
+
+
                         </tr>
                     ))}
                 </tbody>
