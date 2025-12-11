@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { getCompanyJobs, deleteCompanyJob, closeCompanyJob } from "../../../api/companyAPI.js";
 import { useMessage } from "../../../context/messageContext.jsx";
 import CompanyPostJobForm from "./CompanyPostJobForm.jsx";
+import { useNavigate } from "react-router-dom";
 
 const CompanyJobList = ({ refresh = 0 }) => {
     const [jobs, setJobs] = useState([]);
     const { triggerMessage } = useMessage();
     const [editJob, setEditJob] = useState(null);
-
+    const navigate = useNavigate();
 
 
     const token = localStorage.getItem("company_token");
@@ -144,6 +145,15 @@ const CompanyJobList = ({ refresh = 0 }) => {
                                     >
                                         Delete
                                     </button>
+
+                                    {/* applicants  */}
+                                    <button
+                                        className="bg-violet-600 text-white px-3 py-1 rounded"
+                                        onClick={() => navigate(`/company/applicants/${job._id}`)}
+                                    >
+                                        Applicants
+                                    </button>
+
                                 </div>
 
                             </div>

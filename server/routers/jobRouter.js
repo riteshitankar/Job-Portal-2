@@ -1,10 +1,5 @@
 import express from "express";
-import {
-  createJob,
-  handleJobAction,
-  handleJobApplication,
-  getJobData, 
-  editJob
+import { createJob, handleJobAction, handleJobApplication, getJobData,  editJob, getApplicants, updateApplicantStatus
 } from "../controllers/jobController.js";
 import { AuthCompany } from "../middlewares/AuthCompany.js";
 import { AuthUser } from "../middlewares/AuthUser.js";
@@ -25,5 +20,10 @@ jobRouter.get("/get-jobs", getJobData);
 
 // for edit job 
 jobRouter.patch("/edit/:jobId", AuthCompany, editJob);
+
+jobRouter.get("/job/applicants/:jobId", AuthCompany, getApplicants);
+
+jobRouter.put("/job/applicants/:jobId/update", AuthCompany, updateApplicantStatus);
+
 
 export { jobRouter };
