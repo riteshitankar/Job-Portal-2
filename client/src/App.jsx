@@ -19,6 +19,7 @@ import Message from './components/sections/actions/Message.jsx';
 
 // for job detail page 
 import JobDetailsPage from "./components/pages/JobDetailsPage.jsx";
+import CompanyApplicantsPage from "./components/pages/CompanyDashboard/CompanyApplicantsPage";
 
 const App = () => {
   return (
@@ -41,6 +42,9 @@ const App = () => {
                 <Route path='/company/dashboard' element={<CompanyDashboard />} />
                 {/* job details page  */}
                 <Route path="/job/:jobId" element={<JobDetailsPage />} />
+
+                <Route path="/company/applicants/:jobId" element={<CompanyApplicantsPage />} />
+
 
               </Routes>
             </Router>

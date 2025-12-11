@@ -165,24 +165,25 @@ const getApplicants = async (req, res) => {
 
     const job = await jobModel
       .findById(jobId)
-      .populate("jobCreatedBy", "name companyDetails")
-      .populate("applications", "name phone email");
+      .populate("applications", "name email phone");
 
     if (!job) return res.status(404).json({ message: "Job not found" });
 
-    // Convert applications into applicant objects
-    const applicants = job.applications.map((user) => ({
-      user,
-      status: "pending",
-    }));
-
-    res.json({ job: { ...job.toObject(), applicants } });
+    res.status(200).json({
+      job: {
+        title: job.title,
+        jobCreatedBy: job.jobCreatedBy,
+        jobRequirements: job.jobRequirements
+      },
+      applicants: job.applications
+    });
 
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Failed to fetch applicants" });
+    console.log("get applicants error:", err);
+    res.status(500).json({ message: "Failed to load applicants", err });
   }
 };
+
 
 const updateApplicantStatus = async (req, res) => {
   try {
