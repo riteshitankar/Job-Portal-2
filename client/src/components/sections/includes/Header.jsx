@@ -1,71 +1,94 @@
-import React from 'react'
-
-import "./includes.scss"
-import { MdWorkspacesOutline } from "react-icons/md";
-import { FaUser } from "react-icons/fa";
-import { IoMdArrowDropdown } from "react-icons/io";
-
-import { useUser } from '../../../context/userContext.jsx'
-
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../../../context/userContext.jsx";
+import { useCompany } from "../../../context/companyContext.jsx";
 
 const Header = () => {
+  const navigate = useNavigate();
 
-    let { user } = useUser()
+  const { user, logout: userLogout } = useUser();
+  const { company, logout: companyLogout } = useCompany();
 
-    let navigate = useNavigate()
+  const isUserLoggedIn = !!localStorage.getItem("token");
+  const isCompanyLoggedIn = !!localStorage.getItem("company_token");
 
-    console.log(user)
+  const handleLogoutUser = () => {
+    if (isUserLoggedIn) {
+      userLogout();
+      navigate("/user-login-register");
+    }
+  };
+  const handleLogoutCompany = () => {
+    if (isCompanyLoggedIn) {
+      companyLogout();
+      navigate("/company-login-register");
+    }
+  };
 
-    return (
-        <header id='header'>
-            <div className='content-container bg-dark'>
-                <div className='content text-light flex justify-between items-center'>
-                    <div className='logo flex gap-2 items-center cursor-pointer' onClick={() => navigate("/")}>
-                        <MdWorkspacesOutline size={30} />
-                        <span className='bg-dark text-primary text-[1.25rem] font-bold'>
-                            JOB CHAIYE ?
-                        </span>
-                    </div>
-                    <div className='search-bar grow'>
-                        <form className="max-w-md mx-auto">
-                            <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                    <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                    </svg>
-                                </div>
-                                <input type="search" id="default-search" className="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search Jobs Here ..." required />
-                                <button type="submit" className="text-white absolute end-0 top-1/2 -translate-y-1/2 bg-primary hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-primary dark:focus:ring-blue-800">Search</button>
-                            </div>
-                        </form>
-                    </div>
-                    <div className='account flex items-center gap-2'>
-                        {/* if user is loged in then hello, user name ! */}
-                        {/* if not login/register */}
-                        <FaUser size={27} className='text-light' />
-                        {
-                            user.logedIn ?
-                                <span className='flex gap-2 items-center'>
-                                    <span className='font-bold'>
-                                        Welcome,</span>
-                                    <span className='text-primary flex items-center gap-1'>
-                                        {user.name}
-                                        <IoMdArrowDropdown className='text-light' />
-                                    </span>
-                                    !
-                                </span>
-                                :
-                                <span className='cursor-pointer' onClick={() => { navigate("/user-login-register") }}>Please
-                                    <span className='text-primary'> Login/Register !</span>
-                                </span>
-                        }
-                    </div>
-                </div>
-            </div>
-        </header>
-    )
-}
+  return (
+    <header className="bg-white shadow sticky top-0 z-50">
+      <div className="container mx-auto flex justify-between items-center px-6 py-4">
 
-export default Header
+        {/* LOGO */}
+        <Link to="/" className="text-2xl font-bold text-primary">
+          Job<span className="text-black">Portal</span>
+        </Link>
+
+        {/* NAV */}
+        <nav className="flex items-center gap-6">
+
+          {/* Guest */}
+          {!isUserLoggedIn && !isCompanyLoggedIn && (
+            <>
+              <Link to="/user-login-register" className="font-semibold">
+                User Login
+              </Link>
+              <Link to="/company-login-register" className="font-semibold">
+                Company Login
+              </Link>
+            </>
+          )}
+
+          {/* User */}
+          {isUserLoggedIn && (
+            <>
+              <Link to="/user/dashboard" className="font-semibold">
+                UserDB
+              </Link>
+              <span className="font-semibold">
+                Hi, {user?.name}
+              </span>
+              <button
+                onClick={handleLogoutUser}
+                className="bg-red-500 text-white px-4 py-1 rounded"
+              >
+                Logout
+              </button>
+            </>
+          )}
+
+          {/* Company */}
+          {isCompanyLoggedIn && (
+            <>
+              <Link to="/company/dashboard" className="font-semibold">
+                CompanyDB
+              </Link>
+              <span className="font-semibold">
+                {company?.companyDetails?.name}
+              </span>
+              <button
+                onClick={handleLogoutCompany}
+                className="bg-red-500 text-white px-4 py-1 rounded"
+              >
+                Logout
+              </button>
+            </>
+          )}
+
+        </nav>
+      </div>
+    </header>
+  );
+};
+
+export default Header;

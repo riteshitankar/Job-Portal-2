@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useCompany } from "../../../context/companyContext.jsx";
 import { useMessage } from "../../../context/messageContext.jsx";
 import { useNavigate } from "react-router-dom";
-import CompanyHeader from "../../includes/CompanyHeader.jsx";
-import CompanyFooter from "../../includes/CompanyFooter.jsx";
+// import CompanyHeader from "../../includes/CompanyHeader.jsx";
+// import CompanyFooter from "../../includes/CompanyFooter.jsx";
+import Header from "../../sections/includes/Header.jsx";
+import Footer from "../../sections/includes/Footer.jsx";
 import CompanyProfile from "./CompanyProfile.jsx";
 
 const CompanyDashboard = () => {
@@ -30,7 +32,7 @@ const CompanyDashboard = () => {
 
   return (
     <>
-      <CompanyHeader />
+      <Header />
       <div id="company-dashboard" className="p-6">
         <div className="grid grid-cols-4 gap-6">
           <div className="col-span-1 bg-white p-4 rounded shadow">
@@ -44,7 +46,7 @@ const CompanyDashboard = () => {
           </div>
         </div>
       </div>
-      <CompanyFooter />
+      <Footer />
     </>
   );
 };

@@ -139,8 +139,6 @@ const CompanyProfile = () => {
                 <CompanyJobList refresh={jobRefresh} />
               </div>
             </div>
-
-
           </div>
         </div>
       </div>
