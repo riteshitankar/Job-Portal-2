@@ -458,7 +458,26 @@ const getAppliedJobs = async (req, res) => {
   }
 };
 
+const getAcceptedJobsCount = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const jobs = await jobModel.find({
+      [`applicantStatus.${userId}`]: "accepted"
+    });
+
+    res.status(200).json({
+      acceptedCount: jobs.length
+    });
+
+  } catch (err) {
+    console.log("Error loading accepted jobs:", err);
+    res.status(500).json({ message: "Failed to load accepted jobs" });
+  }
+};
 
 
 
-export { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile, getUserAppliedJobs, getAppliedJobs }
+
+
+export { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile, getUserAppliedJobs, getAppliedJobs, getAcceptedJobsCount }

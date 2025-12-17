@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from "axios";
 import ReactQuill from 'react-quill';
 import '../../../../../node_modules/react-quill/dist/quill.snow.css'
 // style
@@ -19,6 +20,10 @@ import { useMessage } from '../../../../context/messageContext';
 // for redirect
 import { useNavigate } from 'react-router-dom';
 
+// import React, { useEffect, useState } from "react";
+// import { useUser } from '../../../../context/userContext';
+
+
 import {
     userProfilePicture,
     requestOTPForPasswordReset,
@@ -32,12 +37,32 @@ import {
 import OtpInput from 'react-otp-input';
 
 const Profile = () => {
-
     //logout
     let { user, fetchUserProfile, logout } = useUser();
     let { triggerMessage } = useMessage();
+    const [acceptedCount, setAcceptedCount] = useState(0);
     // top navigate user on home page
     let navigate = useNavigate();
+    useEffect(() => {
+        fetchAcceptedCount();
+    }, []);
+
+    const fetchAcceptedCount = async () => {
+        try {
+            const token = localStorage.getItem("token");
+
+            const res = await axios.get(
+                "http://localhost:5000/user/accepted-jobs-count",
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            setAcceptedCount(res.data.acceptedCount);
+        } catch (err) {
+            console.log("Error loading accepted count", err);
+        }
+    };
 
     // for profile picture 
     let [triggerProfilePictureChange, setTriggerProfilePictureChange] = useState(false);
@@ -315,7 +340,10 @@ const Profile = () => {
                             <span className='font-bold'>Applied Jobs</span>
                         </div>
                         <div className='profile-selected rounded flex flex-col justify-center items-center gap-4 text-dark'>
-                            <span className='text-4xl'>0</span>
+                            <span className='text-4xl'>
+                                {user.logedIn ? acceptedCount : 0}
+                            </span>
+
                             <span className='font-bold'>Profile Selected</span>
                         </div>
                     </div>

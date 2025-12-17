@@ -4,6 +4,7 @@ import { AuthUser } from "../middlewares/AuthUser.js"
 import upload from "../config/multerConfig.js"
 import profilePicUpload from "../config/multerProfilePic.js";
 import { getUserAppliedJobs } from "../controllers/userController.js";
+import { getAcceptedJobsCount } from "../controllers/userController.js";
 
 
 let userRouter = express.Router()
@@ -44,5 +45,10 @@ userRouter.patch("/update-bio", AuthUser, updateUserBio);
 userRouter.post("/upload-resume", AuthUser, upload, uploadResume);
 userRouter.delete("/delete-resume", AuthUser, deleteResume);
 userRouter.get("/applied-jobs", AuthUser, getUserAppliedJobs);
+userRouter.get(
+  "/accepted-jobs-count",
+  AuthUser,
+  getAcceptedJobsCount
+);
 
 export { userRouter }
