@@ -20,42 +20,64 @@ const HomeJobList = () => {
 
   return (
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {jobs.map((job) => (
-        <div
-          key={job._id}
-          className="border rounded-lg p-5 shadow hover:shadow-lg transition bg-white"
-        >
-          <h2 className="text-xl font-bold text-blue-700">{job.title}</h2>
+      {jobs.map((job) => {
+        const isClosed = job.closed;
+        const isLimitReached =
+          job.applications?.length >= job.maxApplications;
 
-          <p className="text-gray-600 mt-1">
-            <strong>Company:</strong> {job.jobCreatedBy?.companyDetails?.name}
-          </p>
-
-          <p className="text-gray-500 text-sm mt-1">
-            Posted on:{" "}
-            {new Date(job.jobRequirements.postDate).toLocaleString("en-IN", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })}
-          </p>
-
-          {/* <button
-            onClick={() => window.location.href = `/job/${job._id}`}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800"
+        return (
+          <div
+            key={job._id}
+            className="relative border rounded-xl p-5 shadow-sm hover:shadow-lg transition bg-white"
           >
-            View More
-          </button> */}
-          <Link
-            to={`/job/${job._id}`}
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-          >
-            View More
-          </Link>
+            {/* STATUS BADGE */}
+            <span
+              className={`absolute top-4 right-4 text-xs font-semibold px-3 py-1 rounded-full
+            ${isClosed
+                  ? "bg-red-100 text-red-700"
+                  : isLimitReached
+                    ? "bg-orange-100 text-orange-700"
+                    : "bg-green-100 text-green-700"
+                }`}
+            >
+              {isClosed
+                ? "Closed"
+                : isLimitReached
+                  ? "Limit Reached"
+                  : "Open"}
+            </span>
 
-        </div>
-      ))}
+            <h2 className="text-xl font-bold text-blue-700 mb-1">
+              {job.title}
+            </h2>
+
+            <p className="text-gray-700">
+              <strong>Company:</strong>{" "}
+              {job.jobCreatedBy?.companyDetails?.name}
+            </p>
+
+            <p className="text-gray-500 text-sm mt-1">
+              Posted on{" "}
+              {new Date(job.jobRequirements.postDate).toLocaleString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
+            </p>
+
+            <div className="mt-4">
+              <Link
+                to={`/job/${job._id}`}
+                className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+              >
+                View Details →
+              </Link>
+            </div>
+          </div>
+        );
+      })}
     </div>
+
   );
 };
 

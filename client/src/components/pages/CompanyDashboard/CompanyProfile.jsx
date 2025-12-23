@@ -1,162 +1,292 @@
 import React, { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+
+import { motion } from "framer-motion";
+import { useDropzone } from "react-dropzone";
+
 import { useCompany } from "../../../context/companyContext.jsx";
 import { useMessage } from "../../../context/messageContext.jsx";
-import { companyUploadFile, uploadCompanyDocument, deleteCompanyDocument, updateCompanyBio } from "../../../api/companyAPI.js";
+
+import {
+  companyUploadFile,
+  uploadCompanyDocument,
+  deleteCompanyDocument,
+  updateCompanyBio
+} from "../../../api/companyAPI.js";
+
 import CompanyPostJobForm from "./CompanyPostJobForm.jsx";
 import CompanyJobList from "./CompanyJobList.jsx";
-
 
 const CompanyProfile = () => {
   const { company, fetchCompanyProfile } = useCompany();
   const { triggerMessage } = useMessage();
 
-  const [logoPreview, setLogoPreview] = useState(null);
   const [selectedLogo, setSelectedLogo] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
   const [showBioPopup, setShowBioPopup] = useState(false);
   const [bioValue, setBioValue] = useState(company.companyDetails?.bio || "");
-  const [showDocumentsModal, setShowDocumentsModal] = useState(false);
   const [jobRefresh, setJobRefresh] = useState(0);
 
+  /* ================= DROPZONE ================= */
 
-
-
-  const handleLogoSelect = (e) => {
-    const file = e.target.files[0];
+  const onDrop = (acceptedFiles) => {
+    const file = acceptedFiles[0];
     if (!file) return;
     setSelectedLogo(file);
     setLogoPreview(URL.createObjectURL(file));
   };
 
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: { "image/*": [] },
+    maxFiles: 1,
+    onDrop,
+  });
+
   const handleUploadLogo = async () => {
     if (!selectedLogo) return triggerMessage("warning", "No logo selected");
+
     const fd = new FormData();
     fd.append("file", selectedLogo);
+
     try {
-      await companyUploadFile(localStorage.getItem("company_token"), "company_logo", fd);
+      await companyUploadFile(
+        localStorage.getItem("company_token"),
+        "company_logo",
+        fd
+      );
       triggerMessage("success", "Company logo uploaded");
-      setLogoPreview(null);
       setSelectedLogo(null);
+      setLogoPreview(null);
       await fetchCompanyProfile();
-    } catch (err) {
+    } catch {
       triggerMessage("danger", "Upload failed");
     }
   };
 
+  /* ================= DOCUMENTS ================= */
+
   const handleUploadDocument = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     const fd = new FormData();
     fd.append("file", file);
+
     try {
       await uploadCompanyDocument(localStorage.getItem("company_token"), fd);
       triggerMessage("success", "Document uploaded");
       await fetchCompanyProfile();
-    } catch (err) {
+    } catch {
       triggerMessage("danger", "Document upload failed");
     }
   };
 
   const handleDeleteDocument = async (filename) => {
-    if (!confirm("Are you sure to delete this document?")) return;
+    if (!confirm("Delete this document?")) return;
     try {
-      await deleteCompanyDocument(localStorage.getItem("company_token"), filename);
+      await deleteCompanyDocument(
+        localStorage.getItem("company_token"),
+        filename
+      );
       triggerMessage("success", "Document deleted");
       await fetchCompanyProfile();
-    } catch (err) {
+    } catch {
       triggerMessage("danger", "Delete failed");
     }
   };
 
+  /* ================= BIO ================= */
+
   const saveBio = async () => {
     const textOnly = bioValue.replace(/<[^>]*>/g, "").trim();
-    if (textOnly.length < 5) return triggerMessage("warning", "Bio must be at least 5 characters!");
+    if (textOnly.length < 5)
+      return triggerMessage("warning", "Bio too short!");
+
     try {
-      await updateCompanyBio(localStorage.getItem("company_token"), bioValue);
+      await updateCompanyBio(
+        localStorage.getItem("company_token"),
+        bioValue
+      );
       triggerMessage("success", "Bio updated");
       setShowBioPopup(false);
       fetchCompanyProfile();
-    } catch (err) {
-      triggerMessage("danger", "Failed to save bio");
+    } catch {
+      triggerMessage("danger", "Bio update failed");
     }
   };
 
   return (
-    <div className="company-profile bg-white p-6 rounded shadow">
-      <div className="flex gap-6">
-        <div>
-          {company.companyLogo ? (
-            <img src={`${import.meta.env.VITE_BASE_API_URL}/uploads/company_logos/${company.companyLogo}`} alt="logo" className="w-40 h-40 object-cover rounded" />
-          ) : (
-            <div className="w-40 h-40 bg-gray-200 flex items-center justify-center">No Logo</div>
-          )}
-          <div className="mt-2">
-            <label className="bg-blue-500 text-white px-3 py-1 rounded cursor-pointer">
-              Change Logo
-              <input type="file" accept="image/*" className="hidden" onChange={handleLogoSelect} />
-            </label>
-            {selectedLogo && <button onClick={handleUploadLogo} className="ml-2 bg-green-500 text-white px-3 py-1 rounded">Upload</button>}
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white p-8 rounded-xl shadow space-y-10"
+    >
+
+      {/* ================= HEADER ================= */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        {/* LOGO */}
+        <div className="space-y-4 text-center">
+          <div
+            {...getRootProps()}
+            className={`border-2 border-dashed rounded-xl p-6 cursor-pointer transition
+              ${isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"}
+            `}
+          >
+            <input {...getInputProps()} />
+            {logoPreview || company.companyLogo ? (
+              <img
+                src={
+                  logoPreview ||
+                  `${import.meta.env.VITE_BASE_API_URL}/uploads/company_logos/${company.companyLogo}`
+                }
+                className="w-40 h-40 object-cover mx-auto rounded-lg"
+              />
+            ) : (
+              <p className="text-gray-500">
+                Drag & drop logo here or click
+              </p>
+            )}
           </div>
+
+          {selectedLogo && (
+            <button
+              onClick={handleUploadLogo}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+            >
+              Upload Logo
+            </button>
+          )}
         </div>
 
-        <div className="flex-1">
-          <h2>{company.companyDetails?.name}</h2>
-          <p>Industry: {company.companyDetails?.industryType}</p>
-          <p>HR Email: {company.companyDetails?.hrEmail}</p>
-          <div className="mt-4">
-            <h4>Bio</h4>
-            {company.companyDetails?.bio ? (
-              <div dangerouslySetInnerHTML={{ __html: company.companyDetails.bio }} />
-            ) : (
-              <div className="italic">[No bio]</div>
-            )}
-            <button onClick={() => { setBioValue(company.companyDetails?.bio || ""); setShowBioPopup(true); }} className="mt-2 bg-blue-500 text-white px-3 py-1 rounded">Edit Bio</button>
-          </div>
-
-          <div className="mt-4">
-            <h4>Documents</h4>
-            <div className="flex gap-2 items-center">
-              <label className="bg-blue-500 text-white px-3 py-1 rounded cursor-pointer">Upload Document
-                <input type="file" accept=".pdf,.doc,.docx,.jpg,.png" className="hidden" onChange={handleUploadDocument} />
-              </label>
-            </div>
-            <ul className="mt-2">
-              {company.documents && company.documents.length > 0 ? company.documents.map((d) => (
-                <li key={d} className="flex items-center gap-3">
-                  <a href={`${import.meta.env.VITE_BASE_API_URL}/uploads/company_documents/${d}`} target="_blank">{d}</a>
-                  <button onClick={() => handleDeleteDocument(d)} className="text-red-500">Delete</button>
-                </li>
-              )) : <li>No documents uploaded</li>}
-            </ul>
-            {/* POST A JOB SECTION */}
-            <div className="mt-6">
-              <h3 className="font-semibold">Job Management</h3>
-              <div style={{ backgroundColor: 'red' }}>
-                <CompanyPostJobForm onPosted={() => {
-                  setJobRefresh((v) => v + 1);
-                }} />
-                <CompanyJobList refresh={jobRefresh} />
-              </div>
-            </div>
-          </div>
+        {/* COMPANY INFO */}
+        <div className="md:col-span-2 space-y-2">
+          <h1 className="text-3xl font-bold text-gray-800">
+            {company.companyDetails?.name}
+          </h1>
+          <p className="text-gray-600">
+            <strong>Industry:</strong>{" "}
+            {company.companyDetails?.industryType}
+          </p>
+          <p className="text-gray-600">
+            <strong>HR Email:</strong>{" "}
+            {company.companyDetails?.hrEmail}
+          </p>
         </div>
       </div>
 
-      {/* Bio popup */}
+      {/* ================= BIO ================= */}
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold text-gray-800">About Company</h2>
+
+        {company.companyDetails?.bio ? (
+          <div
+            className="prose max-w-none text-gray-700"
+            dangerouslySetInnerHTML={{ __html: company.companyDetails.bio }}
+          />
+        ) : (
+          <p className="italic text-gray-400">No bio added.</p>
+        )}
+
+        <button
+          onClick={() => {
+            setBioValue(company.companyDetails?.bio || "");
+            setShowBioPopup(true);
+          }}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
+        >
+          Edit Bio
+        </button>
+      </section>
+
+      {/* ================= DOCUMENTS ================= */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold text-gray-800">Documents</h2>
+
+        <label className="inline-block bg-indigo-600 text-white px-4 py-2 rounded cursor-pointer">
+          Upload Document
+          <input
+            type="file"
+            className="hidden"
+            onChange={handleUploadDocument}
+          />
+        </label>
+
+        <div className="grid gap-2">
+          {company.documents?.length ? (
+            company.documents.map((doc) => (
+              <motion.div
+                key={doc}
+                whileHover={{ scale: 1.02 }}
+                className="flex justify-between items-center bg-gray-50 p-3 rounded"
+              >
+                <a
+                  href={`${import.meta.env.VITE_BASE_API_URL}/uploads/company_documents/${doc}`}
+                  target="_blank"
+                  className="text-blue-600 underline"
+                >
+                  {doc}
+                </a>
+                <button
+                  onClick={() => handleDeleteDocument(doc)}
+                  className="text-red-500 font-semibold"
+                >
+                  Delete
+                </button>
+              </motion.div>
+            ))
+          ) : (
+            <p className="text-gray-400">No documents uploaded</p>
+          )}
+        </div>
+      </section>
+
+      {/* ================= JOB MANAGEMENT ================= */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-bold text-gray-800">Job Management</h2>
+
+        <CompanyPostJobForm
+          onPosted={() => setJobRefresh((v) => v + 1)}
+        />
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <CompanyJobList refresh={jobRefresh} />
+        </motion.div>
+      </section>
+
+      {/* ================= BIO MODAL ================= */}
       {showBioPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
-          <div className="bg-white p-6 rounded w-full max-w-2xl">
-            <h3>Edit Bio</h3>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            className="bg-white p-6 rounded-xl w-full max-w-2xl space-y-4"
+          >
+            <h3 className="text-xl font-semibold">Edit Bio</h3>
             <ReactQuill value={bioValue} onChange={setBioValue} />
-            <div className="flex gap-2 mt-4">
-              <button onClick={saveBio} className="bg-green-500 text-white px-4 py-2 rounded">Save</button>
-              <button onClick={() => setShowBioPopup(false)} className="bg-gray-300 px-4 py-2 rounded">Cancel</button>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={saveBio}
+                className="bg-green-600 text-white px-4 py-2 rounded"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setShowBioPopup(false)}
+                className="bg-gray-300 px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

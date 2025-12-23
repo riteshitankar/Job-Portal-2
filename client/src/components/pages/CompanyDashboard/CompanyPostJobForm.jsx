@@ -1,246 +1,275 @@
 import React, { useState, useEffect } from "react";
 import { createCompanyJob, editCompanyJob } from "../../../api/companyAPI.js";
 import { useMessage } from "../../../context/messageContext.jsx";
-import { useCompany } from "../../../context/companyContext.jsx";
+import { motion } from "framer-motion";
 
 const CompanyPostJobForm = ({ onPosted, editJobData = null, onEdited = null }) => {
-    const { triggerMessage } = useMessage();
+  const { triggerMessage } = useMessage();
 
-    const [loading, setLoading] = useState(false);
-    const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
-    const emptyForm = {
-        title: "",
+  const emptyForm = {
+    title: "",
+    jobRequirements: {
+      type: "",
+      category: "",
+      exprience: "",
+      location: "",
+      offeredSalary: "",
+      description: "",
+    },
+    maxApplications: 0,
+  };
+
+  const [form, setForm] = useState(emptyForm);
+
+  useEffect(() => {
+    if (editJobData) {
+      setForm({
+        title: editJobData.title || "",
         jobRequirements: {
-            type: "",
-            category: "",
-            exprience: "",
-            location: "",
-            offeredSalary: "",
-            description: "",
+          type: editJobData.jobRequirements?.type || "",
+          category: editJobData.jobRequirements?.category || "",
+          exprience: editJobData.jobRequirements?.exprience || "",
+          location: editJobData.jobRequirements?.location || "",
+          offeredSalary: editJobData.jobRequirements?.offeredSalary || "",
+          description: editJobData.jobRequirements?.description || "",
+          postDate: editJobData.jobRequirements?.postDate || new Date(),
         },
-        maxApplications: 0,
+        maxApplications: editJobData.maxApplications || 0,
+      });
+      setOpen(true);
+    }
+  }, [editJobData]);
+
+  /* ================= FIELD HANDLER ================= */
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name.includes("jobRequirements.")) {
+      const key = name.split(".")[1];
+      setForm((prev) => ({
+        ...prev,
+        jobRequirements: {
+          ...prev.jobRequirements,
+          [key]: value,
+        },
+      }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  /* ================= SUBMIT ================= */
+  const submit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const token = localStorage.getItem("company_token");
+
+    const payload = {
+      title: form.title,
+      jobRequirements: {
+        ...form.jobRequirements,
+        postDate: form.jobRequirements.postDate || new Date(),
+      },
+      maxApplications: Number(form.maxApplications),
     };
 
-    const [form, setForm] = useState(emptyForm);
+    try {
+      if (editJobData) {
+        await editCompanyJob(token, editJobData._id, payload);
+        triggerMessage("success", "Job updated successfully!");
+        onEdited && onEdited();
+      } else {
+        await createCompanyJob(token, payload);
+        triggerMessage("success", "Job posted successfully!");
+        onPosted && onPosted();
+      }
 
-    useEffect(() => {
-        if (editJobData) {
-            setForm({
-                title: editJobData.title || "",
-                jobRequirements: {
-                    type: editJobData.jobRequirements?.type || "",
-                    category: editJobData.jobRequirements?.category || "",
-                    exprience: editJobData.jobRequirements?.exprience || "",
-                    location: editJobData.jobRequirements?.location || "",
-                    offeredSalary: editJobData.jobRequirements?.offeredSalary || "",
-                    description: editJobData.jobRequirements?.description || "",
-                    postDate: editJobData.jobRequirements?.postDate || new Date(),
-                },
-                maxApplications: editJobData.maxApplications || 0,
-            });
+      setForm(emptyForm);
+      setOpen(false);
+    } catch (err) {
+      console.log(err);
+      triggerMessage("danger", "Failed to save job");
+    }
 
-            setOpen(true);
-        }
-    }, [editJobData]);
+    setLoading(false);
+  };
 
-    // FORM FIELD HANDLER
-    const handleChange = (e) => {
-        const { name, value } = e.target;
+  return (
+    <div className="mt-8">
 
-        if (name.includes("jobRequirements.")) {
-            const key = name.split(".")[1];
-            setForm((prev) => ({
-                ...prev,
-                jobRequirements: {
-                    ...prev.jobRequirements,
-                    [key]: value,
-                },
-            }));
-        } else {
-            setForm((prev) => ({ ...prev, [name]: value }));
-        }
-    };
+      {/* TOGGLE BUTTON */}
+      {!editJobData && (
+        <button
+          onClick={() => setOpen(!open)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold transition"
+        >
+          {open ? "Close Job Form" : "+ Post a New Job"}
+        </button>
+      )}
 
-    // SUBMIT FORM
-    const submit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+      {/* FORM */}
+      {open && (
+        <motion.form
+          onSubmit={submit}
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-6 bg-gray-50 p-6 rounded-xl shadow-md space-y-6"
+        >
+          <h3 className="text-xl font-bold text-gray-800">
+            {editJobData ? "Edit Job" : "Create New Job"}
+          </h3>
 
-        const token = localStorage.getItem("company_token");
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-        const payload = {
-            title: form.title,
-            jobRequirements: {
-                ...form.jobRequirements,
-                postDate: form.jobRequirements.postDate || new Date(),
-            },
-            maxApplications: Number(form.maxApplications),
-        };
+            {/* JOB TITLE */}
+            <div className="md:col-span-2">
+              <label className="text-sm font-semibold text-gray-700">
+                Job Title
+              </label>
+              <input
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                required
+                placeholder="Frontend Developer"
+                className="mt-1 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+              />
+            </div>
 
-        try {
-            if (editJobData) {
-                await editCompanyJob(token, editJobData._id, payload);
-                triggerMessage("success", "Job updated successfully!");
-                onEdited && onEdited();
-            } else {
-                await createCompanyJob(token, payload);
-                triggerMessage("success", "Job posted successfully!");
-                onPosted && onPosted();
-            }
+            {/* TYPE */}
+            <div>
+              <label className="text-sm font-semibold text-gray-700">Job Type</label>
+              <input
+                name="jobRequirements.type"
+                value={form.jobRequirements.type}
+                onChange={handleChange}
+                placeholder="Full-time / Internship"
+                className="mt-1 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+                required
+              />
+            </div>
 
-            setOpen(false);
-            setForm(emptyForm); // reset form after posting
+            {/* CATEGORY */}
+            <div>
+              <label className="text-sm font-semibold text-gray-700">Category</label>
+              <input
+                name="jobRequirements.category"
+                value={form.jobRequirements.category}
+                onChange={handleChange}
+                placeholder="IT / Marketing"
+                className="mt-1 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+                required
+              />
+            </div>
 
-        } catch (err) {
-            console.log(err);
-            triggerMessage("danger", "Failed to save job");
-        }
+            {/* EXPERIENCE */}
+            <div>
+              <label className="text-sm font-semibold text-gray-700">Experience</label>
+              <input
+                name="jobRequirements.exprience"
+                value={form.jobRequirements.exprience}
+                onChange={handleChange}
+                placeholder="0-2 years"
+                className="mt-1 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+                required
+              />
+            </div>
 
-        setLoading(false);
-    };
+            {/* LOCATION */}
+            <div>
+              <label className="text-sm font-semibold text-gray-700">Location</label>
+              <input
+                name="jobRequirements.location"
+                value={form.jobRequirements.location}
+                onChange={handleChange}
+                placeholder="Remote / Mumbai"
+                className="mt-1 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+                required
+              />
+            </div>
 
-    return (
-        <div className="mt-6">
-            {!editJobData && (
-                <button
-                    onClick={() => setOpen(!open)}
-                    className="bg-primary text-white px-4 py-2 rounded"
-                >
-                    {open ? "Close Job Form" : "Post a New Job"}
-                </button>
-            )}
+            {/* SALARY */}
+            <div>
+              <label className="text-sm font-semibold text-gray-700">Offered Salary</label>
+              <input
+                type="number"
+                name="jobRequirements.offeredSalary"
+                value={form.jobRequirements.offeredSalary}
+                onChange={handleChange}
+                placeholder="50000"
+                className="mt-1 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+                required
+              />
+            </div>
 
-            {open && (
-                <form onSubmit={submit} className="mt-4 bg-white p-4 rounded shadow">
-                    <div className="grid grid-cols-2 gap-4">
-                        
-                        {/* Title */}
-                        <div>
-                            <label className="opacity-70">Job Title</label>
-                            <input
-                                name="title"
-                                value={form.title}
-                                onChange={handleChange}
-                                required
-                                className="mt-2 w-full p-2 border rounded"
-                            />
-                        </div>
+            {/* MAX APPLICATIONS */}
+            <div>
+              <label className="text-sm font-semibold text-gray-700">
+                Max Applications
+              </label>
+              <input
+                type="number"
+                name="maxApplications"
+                value={form.maxApplications}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    maxApplications: e.target.value,
+                  }))
+                }
+                placeholder="50"
+                className="mt-1 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+                required
+              />
+            </div>
 
-                        {/* Type */}
-                        <div>
-                            <label className="opacity-70">Job Type</label>
-                            <input
-                                name="jobRequirements.type"
-                                value={form.jobRequirements.type}
-                                onChange={handleChange}
-                                required
-                                className="mt-2 w-full p-2 border rounded"
-                            />
-                        </div>
+            {/* DESCRIPTION */}
+            <div className="md:col-span-2">
+              <label className="text-sm font-semibold text-gray-700">
+                Job Description
+              </label>
+              <textarea
+                name="jobRequirements.description"
+                value={form.jobRequirements.description}
+                onChange={handleChange}
+                rows="5"
+                placeholder="Describe the role, responsibilities, and requirements..."
+                className="mt-1 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+                required
+              />
+            </div>
+          </div>
 
-                        {/* Category */}
-                        <div>
-                            <label className="opacity-70">Category</label>
-                            <input
-                                name="jobRequirements.category"
-                                value={form.jobRequirements.category}
-                                onChange={handleChange}
-                                required
-                                className="mt-2 w-full p-2 border rounded"
-                            />
-                        </div>
+          {/* ACTIONS */}
+          <div className="flex justify-end gap-3 pt-4 border-t">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="px-5 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 transition"
+            >
+              Cancel
+            </button>
 
-                        {/* Experience */}
-                        <div>
-                            <label className="opacity-70">Experience</label>
-                            <input
-                                name="jobRequirements.exprience"
-                                value={form.jobRequirements.exprience}
-                                onChange={handleChange}
-                                required
-                                className="mt-2 w-full p-2 border rounded"
-                            />
-                        </div>
-
-                        {/* Location */}
-                        <div>
-                            <label className="opacity-70">Location</label>
-                            <input
-                                name="jobRequirements.location"
-                                value={form.jobRequirements.location}
-                                onChange={handleChange}
-                                required
-                                className="mt-2 w-full p-2 border rounded"
-                            />
-                        </div>
-
-                        {/* Salary */}
-                        <div>
-                            <label className="opacity-70">Offered Salary</label>
-                            <input
-                                name="jobRequirements.offeredSalary"
-                                type="number"
-                                value={form.jobRequirements.offeredSalary}
-                                onChange={handleChange}
-                                required
-                                className="mt-2 w-full p-2 border rounded"
-                            />
-                        </div>
-
-                        {/* Description */}
-                        <div className="col-span-2">
-                            <label className="opacity-70">Description</label>
-                            <textarea
-                                name="jobRequirements.description"
-                                value={form.jobRequirements.description}
-                                onChange={handleChange}
-                                rows="5"
-                                required
-                                className="mt-2 w-full p-2 border rounded"
-                            />
-                        </div>
-
-                        {/* Max Applications */}
-                        <div>
-                            <label className="opacity-70">Max Applications</label>
-                            <input
-                                name="maxApplications"
-                                type="number"
-                                value={form.maxApplications}
-                                onChange={(e) =>
-                                    setForm((prev) => ({
-                                        ...prev,
-                                        maxApplications: e.target.value,
-                                    }))
-                                }
-                                className="mt-2 w-full p-2 border rounded"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="mt-4 flex gap-2">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="bg-green-600 text-white px-4 py-2 rounded"
-                        >
-                            {loading ? "Saving..." : editJobData ? "Save Changes" : "Post Job"}
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={() => setOpen(false)}
-                            className="bg-gray-300 px-4 py-2 rounded"
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            )}
-        </div>
-    );
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold transition"
+            >
+              {loading
+                ? "Saving..."
+                : editJobData
+                ? "Save Changes"
+                : "Post Job"}
+            </button>
+          </div>
+        </motion.form>
+      )}
+    </div>
+  );
 };
 
 export default CompanyPostJobForm;

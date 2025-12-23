@@ -3,19 +3,19 @@ import { getCompanyJobs, deleteCompanyJob, closeCompanyJob } from "../../../api/
 import { useMessage } from "../../../context/messageContext.jsx";
 import CompanyPostJobForm from "./CompanyPostJobForm.jsx";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const CompanyJobList = ({ refresh = 0 }) => {
     const [jobs, setJobs] = useState([]);
-    const { triggerMessage } = useMessage();
     const [editJob, setEditJob] = useState(null);
+    const { triggerMessage } = useMessage();
     const navigate = useNavigate();
-
 
     const token = localStorage.getItem("company_token");
 
     const loadJobs = async () => {
         try {
-            let res = await getCompanyJobs(token);
+            const res = await getCompanyJobs(token);
             if (res.status === 200) {
                 setJobs(res.data.jobs);
             }
@@ -28,40 +28,41 @@ const CompanyJobList = ({ refresh = 0 }) => {
         loadJobs();
     }, [refresh]);
 
-    // DELETE JOB
+    /* ================= ACTIONS ================= */
+
     const handleDelete = async (jobId) => {
         if (!confirm("Delete this job permanently?")) return;
 
         try {
-            let res = await deleteCompanyJob(token, jobId);
+            const res = await deleteCompanyJob(token, jobId);
             if (res.status === 202) {
                 triggerMessage("success", "Job deleted");
                 loadJobs();
             }
-        } catch (err) {
+        } catch {
             triggerMessage("danger", "Delete failed");
         }
     };
 
-    // CLOSE JOB
     const handleCloseJob = async (jobId) => {
-        if (!confirm("Close this job? Users will not be able to apply.")) return;
+        if (!confirm("Close this job?")) return;
 
         try {
             const res = await closeCompanyJob(token, jobId);
             if (res.status === 202) {
-                triggerMessage("success", "Job closed successfully");
+                triggerMessage("success", "Job closed");
                 loadJobs();
             }
-        } catch (err) {
+        } catch {
             triggerMessage("danger", "Unable to close job");
         }
     };
 
     return (
-        <div className="mt-6 bg-white p-4 rounded shadow">
-            <h3 className="text-xl font-semibold mb-3">My Posted Jobs</h3>
+        <div className="mt-10 bg-white p-6 rounded-xl shadow space-y-6">
+            <h3 className="text-2xl font-bold text-gray-800">My Posted Jobs</h3>
 
+            {/* EDIT FORM */}
             {editJob && (
                 <CompanyPostJobForm
                     editJobData={editJob}
@@ -72,91 +73,113 @@ const CompanyJobList = ({ refresh = 0 }) => {
                 />
             )}
 
-
+            {/* EMPTY STATE */}
             {jobs.length === 0 ? (
-                <div>No jobs posted yet.</div>
+                <div className="text-gray-500 italic">
+                    No jobs posted yet.
+                </div>
             ) : (
-                <div className="space-y-4">
-                    {jobs.map(job => {
+                <div className="grid gap-5">
+                    {jobs.map((job, index) => {
                         const jr = job.jobRequirements;
 
                         return (
-                            <div key={job._id} className="p-4 border rounded flex justify-between items-start">
+                            <motion.div
+                                key={job._id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                                whileHover={{ scale: 1.01 }}
+                                className="border rounded-xl p-5 shadow-sm hover:shadow-md transition bg-gray-50"
+                            >
+                                <div className="flex flex-col lg:flex-row justify-between gap-6">
 
-                                {/* LEFT SIDE — JOB DETAILS */}
-                                <div>
-                                    <h4 className="font-bold text-lg">{job.title}</h4>
+                                    {/* LEFT — DETAILS */}
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-3">
+                                            <h4 className="text-xl font-semibold text-gray-800">
+                                                {job.title}
+                                            </h4>
 
-                                    {/* job status */}
-                                    <p className="mt-1">
-                                        Status:{" "}
-                                        {job.closed ? (
-                                            <span className="text-red-600 font-semibold">Closed</span>
-                                        ) : (
-                                            <span className="text-green-600 font-semibold">Open</span>
+                                            {/* STATUS BADGE */}
+                                            {job.closed ? (
+                                                <span className="px-3 py-1 text-xs font-semibold bg-red-100 text-red-600 rounded-full">
+                                                    Closed
+                                                </span>
+                                            ) : job.applications.length >= job.maxApplications ? (
+                                                <span className="px-2 py-1 text-sm bg-orange-100 text-orange-700 rounded font-semibold">
+                                                    Application Limit Reached
+                                                </span>
+                                            )
+                                                : (
+                                                    <span className="px-3 py-1 text-xs font-semibold bg-green-100 text-green-600 rounded-full">
+                                                        Open
+                                                    </span>
+                                                )}
+                                        </div>
+
+                                        <p className="text-gray-600">
+                                            {jr.category} • {jr.type} • {jr.exprience}
+                                        </p>
+
+                                        <p className="text-gray-600">
+                                            {jr.location}
+                                        </p>
+
+                                        <p className="text-gray-800 font-semibold">
+                                            ₹ {jr.offeredSalary}
+                                        </p>
+
+                                        <p className="text-sm text-gray-500">
+                                            Posted on{" "}
+                                            {new Date(jr.postDate).toLocaleDateString("en-IN", {
+                                                day: "2-digit",
+                                                month: "short",
+                                                year: "numeric",
+                                            })}
+                                        </p>
+
+                                        {/* APPLICANTS COUNT */}
+                                        <div className="inline-block mt-2 px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded-full">
+                                            Applicants: {job.applications?.length || 0}
+                                        </div>
+                                    </div>
+
+                                    {/* RIGHT — ACTIONS */}
+                                    <div className="flex flex-wrap lg:flex-col gap-2 items-start lg:items-end">
+
+                                        {!job.closed && (
+                                            <button
+                                                onClick={() => handleCloseJob(job._id)}
+                                                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1.5 rounded"
+                                            >
+                                                Close Job
+                                            </button>
                                         )}
-                                    </p>
 
-                                    <p className="">{jr.category} • {jr.type} • {jr.exprience}</p>
-                                    <p className="mt-1">{jr.location}</p>
-                                    <p className="">₹ {jr.offeredSalary}</p>
-
-                                    <p>
-                                        Posted on: {new Date(job.jobRequirements.postDate).toLocaleString('en-IN', {
-                                            day: '2-digit',
-                                            month: 'short',
-                                            year: 'numeric'
-                                        })}
-                                    </p>
-                                </div>
-
-                                {/* RIGHT SIDE — ACTION BUTTONS */}
-                                <div className="flex flex-col gap-2 items-end">
-
-                                    {/* CLOSE JOB BUTTON (only if open) */}
-                                    {!job.closed && (
                                         <button
-                                            onClick={() => handleCloseJob(job._id)}
-                                            className="px-3 py-1 bg-orange-500 text-white rounded"
+                                            onClick={() => setEditJob(job)}
+                                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded"
                                         >
-                                            Close Job
+                                            Edit
                                         </button>
-                                    )}
 
-                                    {/* CLOSED BADGE */}
-                                    {job.closed && (
-                                        <span className="px-3 py-1 bg-gray-400 text-white rounded">
-                                            Closed
-                                        </span>
-                                    )}
-                                    {/* edit  */}
-                                    <button
-                                        onClick={() => setEditJob(job)}
-                                        className="text-blue-500 hover:underline mr-3"
-                                    >
-                                        Edit
-                                    </button>
+                                        <button
+                                            onClick={() => handleDelete(job._id)}
+                                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded"
+                                        >
+                                            Delete
+                                        </button>
 
-
-                                    {/* DELETE BUTTON */}
-                                    <button
-                                        onClick={() => handleDelete(job._id)}
-                                        className="px-3 py-1 bg-red-500 text-white rounded"
-                                    >
-                                        Delete
-                                    </button>
-
-                                    {/* applicants  */}
-                                    <button
-                                        className="bg-violet-600 text-white px-3 py-1 rounded"
-                                        onClick={() => navigate(`/company/applicants/${job._id}`)}
-                                    >
-                                        Applicants
-                                    </button>
-
+                                        <button
+                                            onClick={() => navigate(`/company/applicants/${job._id}`)}
+                                            className="bg-violet-600 hover:bg-violet-700 text-white px-4 py-1.5 rounded"
+                                        >
+                                            Applicants
+                                        </button>
+                                    </div>
                                 </div>
-
-                            </div>
+                            </motion.div>
                         );
                     })}
                 </div>
