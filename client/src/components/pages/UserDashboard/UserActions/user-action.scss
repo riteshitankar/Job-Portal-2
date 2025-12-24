@@ -1,163 +1,272 @@
 #user-profile {
-    height: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 220px auto;
+  background: rgba(var(--light), 1);
+  border-radius: 12px;
+  overflow: hidden;
+
+  /* ================= COVER PHOTO ================= */
+  > .relative {
+    position: relative;
+    height: 220px;
+    width: 100%;
+    overflow: hidden;
+    background: #eaeaea;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    &:hover img {
+      transform: scale(1.03);
+    }
+
+    button {
+      backdrop-filter: blur(6px);
+      background: rgba(0, 0, 0, 0.6);
+      font-size: 0.85rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.85);
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  /* ================= MAIN INFORMATION ================= */
+  .information {
+    width: 100%;
     display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 25% auto;
-    background: rgba(var(--light), 1);
+    grid-template-columns: 1.2fr 0.8fr;
+    grid-template-rows: auto auto;
+    padding: 1.5rem;
+    gap: 1.5rem;
+
+    /* ================= PROFILE CARD ================= */
+    .pnpa {
+      position: relative;
+      padding: 5.5rem 2rem 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+
+      /* ================= PROFILE PICTURE ================= */
+      .profile-picture {
+        width: 160px;
+        height: 160px;
+        position: absolute;
+        top: -80px;
+        left: 2rem;
+        border-radius: 100%;
+        background-color: white;
+        border: 4px solid rgba(var(--primary));
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        z-index: 10;
+
+        > img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        > button {
+          position: absolute;
+          left: 50%;
+          bottom: 6px;
+          transform: translateX(-50%);
+          z-index: 99;
+          background: white;
+          border-radius: 100%;
+          padding: 6px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+        }
+
+        /* ================= PROFILE PIC MODAL ================= */
+        .profile-picture-change {
+          width: 100%;
+          height: 100vh;
+          position: fixed;
+          background-color: rgba(0, 0, 0, 0.75);
+          left: 0;
+          top: 0;
+          z-index: 9999;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          animation: fadeIn 0.25s ease;
+
+          .picture-change-container {
+            width: 50%;
+            height: 50%;
+            background-color: rgba(var(--light), 1);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+          }
+        }
+      }
+
+      /* ================= USER INFO ================= */
+      .user-info-container {
+        background: #fafafa;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+
+        .shadow {
+          border-radius: 10px;
+          background: white;
+          display: flex;
+          gap: 1rem;
+          align-items: center;
+          padding: 1rem 1.2rem;
+          box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+          transition: 0.3s;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+          }
+        }
+
+        .user-info-icon {
+          position: relative;
+          z-index: 1;
+          color: rgba(var(--light));
+          font-size: 1rem;
+
+          &::before {
+            content: "";
+            width: 30px;
+            height: 30px;
+            background-color: rgba(var(--primary));
+            border-radius: 100%;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            z-index: -1;
+            transform: translate(-50%, -50%);
+          }
+        }
+      }
+    }
+
+    /* ================= REPORTS ================= */
+    .reports {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+
+      .applied-jobs,
+      .profile-selected {
+        padding: 1.5rem;
+        border-radius: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background: white;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+        transition: 0.3s;
+        position: relative;
+        overflow: hidden;
+
+        &:hover {
+          transform: translateY(-5px);
+        }
+
+        &::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            120deg,
+            transparent,
+            rgba(255, 255, 255, 0.5),
+            transparent
+          );
+          transform: translateX(-100%);
+          transition: 0.6s;
+        }
+
+        &:hover::after {
+          transform: translateX(100%);
+        }
+
+        span:first-child {
+          font-size: 3rem;
+          font-weight: bold;
+          color: rgba(var(--dark));
+        }
+
+        span:last-child {
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
+      }
+
+      .applied-jobs {
+        background-color: rgba(var(--primary), 0.15);
+      }
+
+      .profile-selected {
+        background-color: rgba(0, 150, 0, 0.15);
+      }
+    }
+
+    /* ================= DOCUMENTS ================= */
+    .documents {
+      grid-column: 1 / 3;
+      background: white;
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+    }
+  }
+}
+
+/* ================= MODAL ANIMATION ================= */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  #user-profile {
+    grid-template-rows: 180px auto;
 
     .information {
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1.2fr 0.8fr;
-        grid-template-rows: auto auto;
-        padding: 1rem;
-        gap: 1rem;
+      grid-template-columns: 1fr;
 
-        .pnpa {
-            position: relative;
-            padding: 2rem;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      .reports {
+        flex-direction: row;
+      }
 
-            .profile-picture {
-                width: 160px;
-                height: 160px;
-                position: absolute;
-                bottom: 100%;
-                left: 2rem;
-                border-radius: 100%;
-                background-color: white;
-                border: 4px solid rgba(var(--primary));
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-                overflow: hidden;
-            
-                >img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                }
+      .pnpa {
+        padding: 4.5rem 1.5rem 1.5rem;
+      }
 
-                >button {
-                    position: absolute;
-                    left: 50%;
-                    bottom: 0;
-                    transform: translate(-50%,0);
-                    z-index: 99;
-                }
-
-                .profile-picture-change {
-                    width: 100%;
-                    height: 100vh;
-                    position: fixed;
-                    background-color: rgba(0, 0, 0, .75);
-                    left: 0;
-                    top: 0;
-                    z-index: 9999;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-
-                    .picture-change-container {
-                        width: 50%;
-                        height: 50%;
-                        background-color: rgba(var(--light), 1);
-                        
-                    }
-
-                }
-
-            }
-
-            .user-info-container {
-                background: #fafafa;
-                border-radius: 12px;
-                // padding: 1.5rem;
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-                box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
-
-                .shadow {
-                    border-radius: 10px;
-                    // padding: 1rem;
-                    background: white;
-                    display: flex;
-                    gap: 1rem;
-                    align-items: center;
-                    box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
-                }
-
-                .user-info-icon {
-                    position: relative;
-                    z-index: 1;
-                    color: rgba(var(--light));
-                    font-size: 1rem;
-
-                    &::before {
-                        content: "";
-                        width: 30px;
-                        height: 30px;
-                        background-color: rgba(var(--primary));
-                        border-radius: 100%;
-                        position: absolute;
-                        left: 50%;
-                        top: 50%;
-                        z-index: -1;
-                        transform: translate(-50%, -50%);
-                    }
-                }
-            }
-        }
-
-        .reports {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-
-            .applied-jobs,
-            .profile-selected {
-                padding: 1.5rem;
-                border-radius: 12px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                flex-direction: column;
-                background: white;
-                box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
-                transition: 0.3s;
-
-                &:hover {
-                    transform: translateY(-5px);
-                }
-
-                span:first-child {
-                    font-size: 3rem;
-                    font-weight: bold;
-                    color: rgba(var(--dark));
-                }
-
-                span:last-child {
-                    font-size: 1.1rem;
-                    font-weight: 600;
-                }
-            }
-
-            .applied-jobs {
-                background-color: rgba(var(--primary), 0.15);
-            }
-
-            .profile-selected {
-                background-color: rgba(0, 150, 0, 0.15);
-            }
-        }
-
-        .documents {
-            grid-column: 1 / 3;
-            background: white;
-            border-radius: 12px;
-            padding: 1rem;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
-        }
+      .profile-picture {
+        left: 50%;
+        transform: translateX(-50%);
+      }
     }
+  }
 }

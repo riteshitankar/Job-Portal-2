@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "./jobTracker.scss";
 
 const JobTracker = () => {
   const [jobs, setJobs] = useState([]);
-
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -15,7 +15,6 @@ const JobTracker = () => {
       const res = await axios.get("http://localhost:5000/user/applied-jobs", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       setJobs(res.data.jobs);
     } catch (err) {
       console.log("Error loading applied jobs:", err);
@@ -23,38 +22,42 @@ const JobTracker = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Job Application Status</h1>
+    <div className="job-tracker-container">
+      <h1 className="tracker-title">Job Application Status</h1>
 
-      <table className="w-full border">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="p-2 border">Job Title</th>
-            <th className="p-2 border">Company</th>
-            <th className="p-2 border">Status</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {jobs.map((job) => (
-            <tr key={job.jobId}>
-              <td className="p-2 border">{job.title}</td>
-              <td className="p-2 border">{job.company}</td>
-              <td
-                className={`p-2 border font-bold ${
-                  job.status === "accepted"
-                    ? "text-green-600"
-                    : job.status === "rejected"
-                    ? "text-red-600"
-                    : "text-yellow-600"
-                }`}
-              >
-                {job.status.toUpperCase()}
-              </td>
+      <div className="tracker-table-wrapper">
+        <table className="tracker-table">
+          <thead>
+            <tr>
+              <th>Job Title</th>
+              <th>Company</th>
+              <th>Status</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {jobs.length === 0 ? (
+              <tr>
+                <td colSpan="3" className="no-data">
+                  No job applications yet
+                </td>
+              </tr>
+            ) : (
+              jobs.map((job) => (
+                <tr key={job.jobId}>
+                  <td>{job.title}</td>
+                  <td>{job.company}</td>
+                  <td>
+                    <span className={`status ${job.status}`}>
+                      {job.status.toUpperCase()}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
