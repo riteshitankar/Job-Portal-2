@@ -476,6 +476,20 @@ const getAcceptedJobsCount = async (req, res) => {
   }
 };
 
+export const uploadUserCoverPhotoController = async (req, res) => {
+  try {
+    req.user.cover_photo = req.file.filename;
+    await req.user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Cover photo updated",
+      cover_photo: req.file.filename,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Cover upload failed" });
+  }
+};
 
 
 

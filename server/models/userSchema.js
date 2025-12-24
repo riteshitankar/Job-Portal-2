@@ -65,6 +65,10 @@ const userSchema = new mongoose.Schema({
         type: [String],
         default: [],
     },
+    cover_photo: {
+        type: String,
+        default: "",
+    },
     timeStamp: {
         type: Date,
         default: Date.now,

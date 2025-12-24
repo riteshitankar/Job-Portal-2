@@ -1,7 +1,8 @@
 import express from "express"
-import { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile  } from "../controllers/userController.js"
+import { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile, uploadUserCoverPhotoController  } from "../controllers/userController.js"
 import { AuthUser } from "../middlewares/AuthUser.js"
 import upload from "../config/multerConfig.js"
+import userCoverPicUpload from "../config/multerUserCoverPic.js"
 import profilePicUpload from "../config/multerProfilePic.js";
 import { getUserAppliedJobs } from "../controllers/userController.js";
 import { getAcceptedJobsCount } from "../controllers/userController.js";
@@ -50,5 +51,12 @@ userRouter.get(
   AuthUser,
   getAcceptedJobsCount
 );
+userRouter.post(
+  "/upload-cover-photo",
+  AuthUser,
+  userCoverPicUpload,
+  uploadUserCoverPhotoController
+);
+
 
 export { userRouter }

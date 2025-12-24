@@ -141,6 +141,20 @@ export const deleteUserResume = (token) => {
     );
 };
 
+export const uploadUserCoverPhoto = async (token, formData) => {
+  return axios.post(
+    `${baseUrl}/upload-cover-photo`,
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+};
+
+
 export const applyForJob = async (token, jobId) => {
   return await axios.post(
     `${import.meta.env.VITE_BASE_API_URL}/job/apply/${jobId}`,
