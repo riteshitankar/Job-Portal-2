@@ -40,7 +40,7 @@ const UserDashboard = () => {
 
             await fetchUserProfile()
 
-            triggerMessage("success", `welcome ${result.data.userData.name} to dashboard !`)
+            triggerMessage("Success", `Welcome ${result.data.userData.name} to dashboard !`)
 
         } catch (err) {
             console.log("cannot provide dashboard access !")
