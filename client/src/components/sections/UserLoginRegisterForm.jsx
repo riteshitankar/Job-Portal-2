@@ -155,8 +155,8 @@ localStorage.setItem("token", result.data.token);
   return (
     <div className='login-register-form'>
       <div className='content'>
-        <div className='login-register-section shadow-lg rounded overflow-hidden'>
-          <div className='register'>
+        <div className=' login-register-section shadow-lg rounded overflow-hidden'>
+          <div className='border-1 border register'>
             {
               showOtpForm ?
                 <form onSubmit={handleOtpFormSubmit} className='h-full flex flex-col justify-center items-center p-5 gap-3'>
@@ -195,13 +195,13 @@ localStorage.setItem("token", result.data.token);
                   <div className='flex gap-3'>
                     <div className='grow'>
                       <div>
-                        <span className='opacity-70'>Name</span>
+                        <span className=''>Name</span>
                       </div>
                       <input name='name' value={registerForm.name} onChange={handleRegisterFormChange} type="text" id="name" className="mt-2 bg-white border border-gray-300 text-dark text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Name" required />
                     </div>
                     <div className='grow'>
                       <div>
-                        <span className='opacity-70'>Phone</span>
+                        <span className=''>Phone</span>
                       </div>
                       <input name='phone' onChange={handleRegisterFormChange} value={registerForm.phone} type="tel" id="phone" className="mt-2 bg-white border border-gray-300 text-dark text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Phone" required />
                     </div>
@@ -209,20 +209,20 @@ localStorage.setItem("token", result.data.token);
                   <div className='flex gap-3'>
                     <div>
                       <div>
-                        <span className='opacity-70'>D.O.B.</span>
+                        <span className=''>D.O.B.</span>
                       </div>
                       <input name='dob' onChange={handleRegisterFormChange} value={registerForm.dob} type="date" id="name" className="mt-2 bg-white border border-gray-300 text-dark text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="dob" required />
                     </div>
                     <div className='grow'>
                       <div>
-                        <span className='opacity-70'>Email</span>
+                        <span className=''>Email</span>
                       </div>
                       <input name='email' onChange={handleRegisterFormChange} value={registerForm.email} type="email" id="email" className="mt-2 bg-white border border-gray-300 text-dark text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Email" required />
                     </div>
                   </div>
                   <div>
                     <div>
-                      <span className='opacity-70'>Address</span>
+                      <span className=''>Address</span>
                     </div>
                     <div className='address-fields w-full flex flex-col gap-3'>
                       <div className='w-full grow'>
@@ -239,7 +239,7 @@ localStorage.setItem("token", result.data.token);
                     </div>
                   </div>
                   <div>
-                    <div className='flex justify-between opacity-70'>
+                    <div className='flex justify-between '>
                       <span>Create Password</span>
                     </div>
                     <div className='flex items-center gap-3'>
@@ -263,17 +263,17 @@ localStorage.setItem("token", result.data.token);
                 </form>
             }
           </div>
-          <div className='login'>
+          <div className='border-1 border login'>
             <form onSubmit={handleLoginFormSubmit} className='h-full flex flex-col justify-center p-5 gap-7'>
               <h1 className='text-2xl font-bold'>Login</h1>
               <div>
                 <div>
-                  <span className='opacity-70'>Email</span>
+                  <span className=''>Email</span>
                 </div>
                 <input name='email' onChange={handleLoginChange} value={loginFrom.email} type="email" id="email" className="mt-2 bg-white border border-gray-300 text-dark text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Please Enter Email" required />
               </div>
               <div>
-                <div className='flex justify-between opacity-70'>
+                <div className='flex justify-between '>
                   <span>Password</span>
                   <span className='text-primary'>Forgot Password ?</span>
                 </div>
@@ -299,9 +299,9 @@ localStorage.setItem("token", result.data.token);
           </div>
           <div className={`slider ${openFormLogin ? "login" : "register"}`}>
             <div className='text-data h-full flex flex-col justify-end gap-2 text-light p-6'>
-              <span className='font-bold text-2xl'>Welcome</span>
-              <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit.?</p>
-              <span className='bg-primary p-2 font-bold w-fit rounded'>Get 20% Off</span>
+              <span className='font-bold text-white text-2xl'>Welcome</span>
+              <p className='text-white '>Lorem ipsum dolor sit amet consectetur, adipisicing elit.?</p>
+              <span className='text-white bg-primary p-2 font-bold w-fit rounded'>Get 20% Off</span>
             </div>
           </div>
         </div>

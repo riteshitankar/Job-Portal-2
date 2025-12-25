@@ -15,16 +15,11 @@
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr;
 
-            .register {
-            }
-
-            .login {
-            }
-
+            
             .slider {
                 width: 50%;
                 height: 100%;
-                background: linear-gradient(0deg,rgba(var(--dark), .75), rgba(var(--dark), .45)), url("../../../assets/media/slider-bg-image.jpg");
+                background: linear-gradient(0deg,rgba(var(--dark), .75), rgba(var(--dark), .45)), url("../asset/pexels-pixabay-273209.jpg");
                 background-position: center center;
                 background-size: cover;
                 position: absolute;
@@ -42,4 +37,97 @@
 
         }
     }
+}
+
+
+
+/* ============================= */
+/* RESPONSIVE STYLES */
+/* ============================= */
+
+@media (max-width: 1024px) {
+  .login-register-form {
+    .content {
+      width: 90%;
+      padding: 2rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .login-register-form {
+    .content {
+      width: 100%;
+      padding: 1.5rem;
+
+      .login-register-section {
+        grid-template-columns: 1fr;
+        overflow: hidden;
+
+        /* Hide slider on mobile */
+        .slider {
+          display: none;
+        }
+
+        .register,
+        .login {
+          width: 100%;
+          padding: 1rem;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .login-register-form {
+    .content {
+      padding: 1rem;
+
+      .login-register-section {
+        border-radius: 12px;
+
+        form {
+          padding: 1rem;
+        }
+
+        input {
+          font-size: 14px;
+          padding: 0.6rem;
+        }
+
+        button {
+          font-size: 14px;
+          padding: 0.6rem;
+        }
+
+        h1 {
+          font-size: 1.3rem;
+        }
+
+        .address-fields {
+          gap: 0.75rem;
+
+          .flex {
+            flex-direction: column;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* OTP inputs responsiveness */
+@media (max-width: 480px) {
+  .login-register-form {
+    input[type="number"],
+    input[type="text"] {
+      font-size: 14px;
+    }
+
+    .otp-input {
+      width: 42px !important;
+      height: 42px !important;
+    }
+  }
 }
