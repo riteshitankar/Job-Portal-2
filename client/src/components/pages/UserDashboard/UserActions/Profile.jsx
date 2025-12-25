@@ -170,11 +170,11 @@ const Profile = () => {
             onClick={() => setTriggerCoverChange(true)}
             className="absolute bottom-3 right-3 bg-black bg-opacity-60 text-white px-3 py-1 rounded flex items-center gap-2"
           >
-            <FaCamera /> Change Cover
+            <FaCamera /> 
           </button>
         </div>
         {/* ================= PROFILE INFO ================= */}
-        <div className='information bg-blue-400'>
+        <div className='information' style={{backgroundColor:'rgba(74, 112, 169, 0.9)'}}>
           <div className='pnpa'>
             <div className='profile-picture'>
               {
@@ -192,8 +192,8 @@ const Profile = () => {
                       />
                       <button
                         onClick={() => setTriggerProfilePictureChange(true)}
-                        className='bg-primary px-2 py-1 bg-white rounded hover:bg-yellow-800 z-10'
-                        style={{ cursor: 'pointer', display: showPasswordReset || showBioPopup || TriggerResumeSection ? 'none' : 'block' }}
+                        className='bg-primary px-2 py-1 bg-white rounded hover:bg-yellow-800 z-10' 
+                        style={{cursor: 'pointer', display: showPasswordReset || showBioPopup || TriggerResumeSection ? 'none' : 'block' }}
                       >
                         <FaCamera />
                       </button>
@@ -370,13 +370,13 @@ const Profile = () => {
           </div>
 
           <div className='reports p-3'>
-            <div className='applied-jobs rounded flex flex-col justify-center items-center gap-4 text-dark'>
+            <div className='border border-1 applied-jobs rounded flex flex-col justify-center items-center gap-4 text-dark'>
               <span className='text-4xl'>
                 {user.logedIn ? user.appliedJobs.length : 0}
               </span>
               <span className='font-bold'>Applied Jobs</span>
             </div>
-            <div className='profile-selected rounded flex flex-col justify-center items-center gap-4 text-dark'>
+            <div className='border border-1 profile-selected rounded flex flex-col justify-center items-center gap-4 text-dark'>
               <span className='text-4xl'>
                 {user.logedIn ? acceptedCount : 0}
               </span>

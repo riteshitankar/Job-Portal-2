@@ -82,10 +82,10 @@ const UserDashboard = () => {
                         </ul>
 
                         <ul className='actions mt-10 flex flex-col gap-10'>
-                            <li id='profile-btn' onClick={handleMenuSelection} className='shadow outline outline-1 p-4 rounded bg-primary font-bold cursor-pointer text-white'>
+                            <li id='profile-btn' onClick={handleMenuSelection} className='shadow outline outline-1 p-4 rounded font-bold cursor-pointer text-white'>
                                 My Profile
                             </li>
-                            <li id='job-tracker-btn' onClick={handleMenuSelection} className='shadow outline outline-1 p-4 rounded bg-primary font-bold cursor-pointer text-white'>
+                            <li id='job-tracker-btn' onClick={handleMenuSelection} className='shadow outline outline-1 p-4 rounded font-bold cursor-pointer text-white'>
                                 Job Application Tracker
                             </li>
                         </ul>

@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../../../context/userContext.jsx";
 import { useCompany } from "../../../context/companyContext.jsx";
 import { FiMenu, FiX } from "react-icons/fi";
+import { BiLogOut } from "react-icons/bi";
+
 
 const Header = () => {
   const navigate = useNavigate();
@@ -64,7 +66,8 @@ const Header = () => {
                 onClick={handleLogoutUser}
                 className="bg-red-500 text-white px-4 py-1 rounded"
               >
-                Logout
+                <BiLogOut />
+
               </button>
             </>
           )}
@@ -85,7 +88,8 @@ const Header = () => {
                 onClick={handleLogoutCompany}
                 className="bg-red-500 text-white px-4 py-1 rounded"
               >
-                Logout
+                <BiLogOut />
+
               </button>
             </>
           )}

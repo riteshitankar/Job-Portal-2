@@ -25,7 +25,7 @@ const CompanyDashboard = () => {
       await fetchCompanyProfile();
       triggerMessage(
         "success",
-        `Welcome ${company.companyDetails?.name || "Company"} 👋`
+        `Welcome ${company.companyDetails?.name || "Company"} to the dashboard`
       );
     } catch (err) {
       console.log("company dashboard access denied", err);
