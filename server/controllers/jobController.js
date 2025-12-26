@@ -165,7 +165,7 @@ const getApplicants = async (req, res) => {
 
     const job = await jobModel
       .findById(jobId)
-      .populate("applications", "name email phone");
+      .populate("applications", "name email phone resume");
 
     if (!job) return res.status(404).json({ message: "Job not found" });
 
@@ -174,7 +174,8 @@ const getApplicants = async (req, res) => {
       _id: u._id,
       name: u.name,
       phone: u.phone,
-      email: u.email.userEmail,  // FIX
+      email: u.email,
+      resume:u.resume,  // FIX
       status: job.applicantStatus?.[u._id] || "pending"
     }));
 

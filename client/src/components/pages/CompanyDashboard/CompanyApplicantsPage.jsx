@@ -105,6 +105,23 @@ const CompanyApplicantsPage = () => {
                     <p className="text-sm text-gray-600 flex items-center gap-2 break-all">
                       <FaEnvelope /> {u.email?.userEmail || "N/A"}
                     </p>
+                    <p className="text-sm text-gray-600 flex items-center gap-2 break-all">
+                      <FaEnvelope />
+                      {u.resume ? (
+                        <a
+                          href={`${import.meta.env.VITE_BASE_API_URL}/uploads/resumes/${u.resume}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-600 underline"
+                        >
+                          View and download resume
+                        </a>
+                      ) : (
+                        <span className="text-gray-400">No Resume</span>
+                      )}
+                    </p>
+
+
                   </div>
 
                   {/* RIGHT */}
