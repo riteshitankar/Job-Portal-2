@@ -21,14 +21,27 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    profile_picture: {
+        type: String, // Cloudinary URL
+        default: null
+    },
+    resume: {
+        url: String,
+        public_id: String
+    },
+
+    cover_photo: {
+        url: String,
+        public_id: String
+    },
     bio: {
         type: String,
         default: "",
     },
-    resume: {
-        type: String,
-        default: null,
-    },
+    // resume: {
+    //     type: String,
+    //     default: null,
+    // },
     email: {
         type: emailSchema,
         required: true,
@@ -57,18 +70,18 @@ const userSchema = new mongoose.Schema({
         type: [String],
         default: [],
     },
-    profile_picture: {
-        type: String,
-        default: "",
-    },
+    // profile_picture: {
+    //     type: String,
+    //     default: "",
+    // },
     appliedJobs: {
         type: [String],
         default: [],
     },
-    cover_photo: {
-        type: String,
-        default: "",
-    },
+    // cover_photo: {
+    //     type: String,
+    //     default: "",
+    // },
     timeStamp: {
         type: Date,
         default: Date.now,

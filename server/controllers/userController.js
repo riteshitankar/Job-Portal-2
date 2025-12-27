@@ -1,11 +1,12 @@
+import cloudinary from "../config/cloudinary.js";
 import nodemailer from "nodemailer"
 import dotenv from "dotenv"
 import { redisClient } from "../utils/redisClient.js"
 import { userModel } from "../models/userSchema.js"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
-import fs from 'fs';
-import path from 'path';
+// import fs from 'fs';
+// import path from 'path';
 import { jobModel } from "../models/jobSchema.js";
 
 dotenv.config({ path: "./config.env" })
@@ -256,47 +257,46 @@ const handleOTPForPasswordReset = async (req, res) => {
 
 const handleUserFileUpload = async (req, res) => {
     try {
-        if (!req.file) throw new Error("Failed to upload a file!");
-        const fileName = req.file.filename;
-        const fileType = req.params.file_type; // 'resume' or 'profile_pictures'
+        if (!req.file) throw new Error("No file uploaded");
 
-        // Determine which field to update
+        const fileType = req.params.file_type;
+
         let updateField = {};
 
         if (fileType === "resume") {
-            updateField = { $push: { documents: fileName } };
-        } else if (fileType === "profile_picture") {
-            updateField = { $set: { profile_picture: fileName } };
-        } else {
-            throw new Error("Invalid file type. Only 'resume' or 'profile_pictures' allowed.");
+            updateField = {
+                resume: {
+                    url: req.file.path,
+                    public_id: req.file.filename
+                }
+            };
+        }
+        else if (fileType === "profile_picture") {
+            updateField = {
+                profile_picture: req.file.path
+            };
+        }
+        else {
+            throw new Error("Invalid file type");
         }
 
-        // Update the user document
-        const result = await userModel.updateOne(
-            { "email.userEmail": req.user.email.userEmail },
-            updateField
+        const result = await userModel.findByIdAndUpdate(
+            req.user._id,
+            updateField,
+            { new: true }
         );
 
-        if (result.modifiedCount === 0) {
-            throw new Error("User not found or file not saved.");
-        }
-
-        const uploadDest = `uploads/${fileType}/${fileName}`;
-
-        res.status(202).json({
-            message: `${fileType === "resume" ? "Resume" : "Profile picture"} uploaded successfully!`,
-            fileName,
-            uploadDest,
+        res.status(200).json({
+            message: "File uploaded successfully",
+            data: updateField
         });
 
     } catch (err) {
-        console.error("Error in handleUserFileUpload:", err);
-        res.status(500).json({
-            message: "Failed to upload the file.",
-            error: err.message || err,
-        });
+        console.log(err);
+        res.status(500).json({ message: "Upload failed" });
     }
 };
+
 
 const fetchProfile = async (req, res) => {
     try {
@@ -351,11 +351,14 @@ const uploadResume = async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-        const resumeFilename = req.file.filename;
-
         const updatedUser = await userModel.findByIdAndUpdate(
             req.user._id,
-            { resume: resumeFilename },
+            {
+                resume: {
+                    url: req.file.path,
+                    public_id: req.file.filename
+                }
+            },
             { new: true }
         );
 
@@ -368,127 +371,137 @@ const uploadResume = async (req, res) => {
     }
 };
 
+
 // Delete Resume
+
 const deleteResume = async (req, res) => {
     try {
         const user = await userModel.findById(req.user._id);
-        if (!user.resume) return res.status(400).json({ message: "No resume to delete" });
 
-        // Delete file from server
-        const filePath = path.join(process.cwd(), "uploads", "resumes", user.resume);
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        if (!user.resume?.public_id)
+            return res.status(400).json({ message: "No resume found" });
+
+        await cloudinary.uploader.destroy(user.resume.public_id, {
+            resource_type: "raw"
+        });
 
         user.resume = null;
         await user.save();
 
         res.status(200).json({ message: "Resume deleted successfully" });
+
     } catch (err) {
         res.status(500).json({ message: "Failed to delete resume" });
     }
 };
 
 
+
 const getUserAppliedJobs = async (req, res) => {
-  try {
-    const userId = req.user._id;
+    try {
+        const userId = req.user._id;
 
-    const user = await userModel.findById(userId);
+        const user = await userModel.findById(userId);
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Load all applied jobs
+        const jobs = await Promise.all(
+            user.appliedJobs.map(async (jobId) => {
+                const job = await jobModel
+                    .findById(jobId)
+                    .populate("jobCreatedBy", "companyDetails.name");
+
+                if (!job) return null;
+
+                const status = job.applicantStatus?.[userId] || "pending";
+
+                return {
+                    jobId: job._id,
+                    title: job.title,
+                    company: job.jobCreatedBy?.companyDetails?.name || "Unknown",
+                    status
+                };
+            })
+        );
+
+        res.json({ jobs: jobs.filter(Boolean) });
+
+    } catch (err) {
+        console.log("Error loading applied jobs:", err);
+        res.status(500).json({ message: "Failed to load applied jobs", err });
     }
-
-    // Load all applied jobs
-    const jobs = await Promise.all(
-      user.appliedJobs.map(async (jobId) => {
-        const job = await jobModel
-          .findById(jobId)
-          .populate("jobCreatedBy", "companyDetails.name");
-
-        if (!job) return null;
-
-        const status = job.applicantStatus?.[userId] || "pending";
-
-        return {
-          jobId: job._id,
-          title: job.title,
-          company: job.jobCreatedBy?.companyDetails?.name || "Unknown",
-          status
-        };
-      })
-    );
-
-    res.json({ jobs: jobs.filter(Boolean) });
-
-  } catch (err) {
-    console.log("Error loading applied jobs:", err);
-    res.status(500).json({ message: "Failed to load applied jobs", err });
-  }
 };
 
 
 const getAppliedJobs = async (req, res) => {
-  try {
-    const userId = req.user._id;
+    try {
+        const userId = req.user._id;
 
-    const jobs = await jobModel
-      .find({ applications: userId })
-      .select("title applicantStatus jobCreatedBy")
-      .populate("jobCreatedBy", "companyDetails.name");
+        const jobs = await jobModel
+            .find({ applications: userId })
+            .select("title applicantStatus jobCreatedBy")
+            .populate("jobCreatedBy", "companyDetails.name");
 
-    const formatted = jobs.map(job => {
-      const status =
-        job.applicantStatus && job.applicantStatus[userId]
-          ? job.applicantStatus[userId]
-          : "pending";
+        const formatted = jobs.map(job => {
+            const status =
+                job.applicantStatus && job.applicantStatus[userId]
+                    ? job.applicantStatus[userId]
+                    : "pending";
 
-      return {
-        jobId: job._id,
-        title: job.title,
-        company: job.jobCreatedBy.companyDetails.name,
-        status
-      };
-    });
+            return {
+                jobId: job._id,
+                title: job.title,
+                company: job.jobCreatedBy.companyDetails.name,
+                status
+            };
+        });
 
-    res.status(200).json({ jobs: formatted });
+        res.status(200).json({ jobs: formatted });
 
-  } catch (err) {
-    console.log("get applied jobs error:", err);
-    res.status(500).json({ message: "Failed to load applied jobs" });
-  }
+    } catch (err) {
+        console.log("get applied jobs error:", err);
+        res.status(500).json({ message: "Failed to load applied jobs" });
+    }
 };
 
 const getAcceptedJobsCount = async (req, res) => {
-  try {
-    const userId = req.user._id;
+    try {
+        const userId = req.user._id;
 
-    const jobs = await jobModel.find({
-      [`applicantStatus.${userId}`]: "accepted"
-    });
+        const jobs = await jobModel.find({
+            [`applicantStatus.${userId}`]: "accepted"
+        });
 
-    res.status(200).json({
-      acceptedCount: jobs.length
-    });
+        res.status(200).json({
+            acceptedCount: jobs.length
+        });
 
-  } catch (err) {
-    console.log("Error loading accepted jobs:", err);
-    res.status(500).json({ message: "Failed to load accepted jobs" });
-  }
+    } catch (err) {
+        console.log("Error loading accepted jobs:", err);
+        res.status(500).json({ message: "Failed to load accepted jobs" });
+    }
 };
 
 export const uploadUserCoverPhotoController = async (req, res) => {
-  try {
-    req.user.cover_photo = req.file.filename;
-    await req.user.save();
+    try {
+        req.user.cover_photo = {
+            url: req.file.path,
+            public_id: req.file.filename
+        };
 
-    res.status(200).json({
-      success: true,
-      message: "Cover photo updated",
-      cover_photo: req.file.filename,
-    });
-  } catch (err) {
-    res.status(500).json({ message: "Cover upload failed" });
-  }
+        await req.user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Cover photo updated",
+            cover_photo: req.file.filename,
+        });
+    } catch (err) {
+        res.status(500).json({ message: "Cover upload failed" });
+    }
 };
 
 

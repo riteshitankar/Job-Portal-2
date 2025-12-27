@@ -184,12 +184,14 @@ const Profile = () => {
                       <img
                         src={
                           user.profile_picture
-                            ? `${import.meta.env.VITE_BASE_API_URL}/uploads/profile_pictures/${user.profile_picture}`
+                            ? `${user.profile_picture}`
                             : "/default-avatar.png"
                         }
                         alt="Profile Picture"
                         className="w-32 h-32 rounded-full object-cover"
                       />
+                      {/* <img src={user.profile_picture} /> */}
+
                       <button
                         onClick={() => setTriggerProfilePictureChange(true)}
                         className='bg-primary px-2 py-1 bg-white rounded hover:bg-yellow-800 z-10' 
