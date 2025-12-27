@@ -374,26 +374,7 @@ const uploadResume = async (req, res) => {
 
 // Delete Resume
 
-const deleteResume = async (req, res) => {
-    try {
-        const user = await userModel.findById(req.user._id);
 
-        if (!user.resume?.public_id)
-            return res.status(400).json({ message: "No resume found" });
-
-        await cloudinary.uploader.destroy(user.resume.public_id, {
-            resource_type: "raw"
-        });
-
-        user.resume = null;
-        await user.save();
-
-        res.status(200).json({ message: "Resume deleted successfully" });
-
-    } catch (err) {
-        res.status(500).json({ message: "Failed to delete resume" });
-    }
-};
 
 
 
@@ -504,7 +485,44 @@ export const uploadUserCoverPhotoController = async (req, res) => {
     }
 };
 
+export const deleteUserResume = async (req, res) => {
+  try {
+    const user = req.user;
+
+    if (!user || !user.resume) {
+      return res.status(400).json({ err: "No resume found to delete" });
+    }
+
+    await cloudinary.uploader.destroy(user.resume.public_id, {
+      resource_type: "raw"
+    });
+
+    user.resume = null;
+    await user.save();
+
+    res.status(200).json({ message: "Resume deleted successfully" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ err: "Resume delete failed" });
+  }
+};
 
 
 
-export { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile, getUserAppliedJobs, getAppliedJobs, getAcceptedJobsCount }
+
+export {
+//   test,
+  handleUserRegister,
+  handleOTPVerification,
+  handleUserLogin,
+  updateUserBio,
+  uploadResume,
+  handleResetPasswordRequest,
+  handleOTPForPasswordReset,
+  handleUserFileUpload,
+  fetchProfile,
+  getUserAppliedJobs,
+  getAppliedJobs,
+  getAcceptedJobsCount
+};

@@ -116,30 +116,51 @@ export const updateUserBio = async (token, bio) => {
 
 
 // src/api/userAPI.js
-export const uploadUserResume = (token, file) => {
-    const formData = new FormData();
-    formData.append("resume", file);  // ← MUST be named "resume"
+// export const uploadUserResume = (token, file) => {
+//     const formData = new FormData();
+//     formData.append("resume", file);  // ← MUST be named "resume"
 
-    return axios.post(
-        `${import.meta.env.VITE_BASE_API_URL}/user/upload-resume`,
-        formData,
-        {
-            headers: {
-                authorization: token,
-                // DO NOT set Content-Type — let browser set it with boundary
-            }
-        }
-    );
+//     return axios.post(
+//         `${import.meta.env.VITE_BASE_API_URL}/user/upload-resume`,
+//         formData,
+//         {
+//             headers: {
+//                 authorization: token,
+//                 // DO NOT set Content-Type — let browser set it with boundary
+//             }
+//         }
+//     );
+// };
+
+export const uploadUserResume = (token, file) => {
+  const fd = new FormData();
+  fd.append("resume", file);
+
+  return axios.post(
+    `${baseUrl}/upload-resume`,
+    fd,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
 };
+
 
 export const deleteUserResume = (token) => {
-    return axios.delete(
-        `${import.meta.env.VITE_BASE_API_URL}/user/delete-resume`,
-        {
-            headers: { authorization: token }
-        }
-    );
+  return axios.delete(
+    `${baseUrl}/delete-resume`,
+    {
+      headers: {
+        authorization: token
+      }
+    }
+  );
 };
+
+
 
 export const uploadUserCoverPhoto = async (token, formData) => {
   return axios.post(

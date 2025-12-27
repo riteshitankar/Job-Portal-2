@@ -1,16 +1,35 @@
 import express from "express"
-import { test, handleUserRegister, handleOTPVerification, handleUserLogin, updateUserBio, uploadResume, deleteResume, handleResetPasswordRequest, handleOTPForPasswordReset, handleUserFileUpload, fetchProfile, uploadUserCoverPhotoController  } from "../controllers/userController.js"
+import {
+   handleUserRegister,
+  handleOTPVerification,
+  handleUserLogin,
+  updateUserBio,
+  uploadResume,
+  handleResetPasswordRequest,
+  handleOTPForPasswordReset,
+  handleUserFileUpload,
+  fetchProfile,
+  getUserAppliedJobs,
+  getAppliedJobs,
+  getAcceptedJobsCount,
+  deleteUserResume,
+  uploadUserCoverPhotoController
+} from "../controllers/userController.js";
+
+
+
 import { AuthUser } from "../middlewares/AuthUser.js"
 import upload from "../config/multerConfig.js"
 import userCoverPicUpload from "../config/multerUserCoverPic.js"
 import profilePicUpload from "../config/multerProfilePic.js";
-import { getUserAppliedJobs } from "../controllers/userController.js";
-import { getAcceptedJobsCount } from "../controllers/userController.js";
+// import authMiddleware from "../middleware/authMiddleware.js";
+// import { AuthUser } from "../middlewares/AuthUser.js";
+
 
 
 let userRouter = express.Router()
 
-userRouter.get("/test", test)
+// userRouter.get("/test", test)
 
 userRouter.post("/register", handleUserRegister)
 
@@ -44,7 +63,7 @@ userRouter.post(
 userRouter.patch("/update-bio", AuthUser, updateUserBio);
 
 userRouter.post("/upload-resume", AuthUser, upload, uploadResume);
-userRouter.delete("/delete-resume", AuthUser, deleteResume);
+// userRouter.delete("/delete-resume", AuthUser, deleteResume);
 userRouter.get("/applied-jobs", AuthUser, getUserAppliedJobs);
 userRouter.get(
   "/accepted-jobs-count",
@@ -58,5 +77,8 @@ userRouter.post(
   uploadUserCoverPhotoController
 );
 
+
+
+userRouter.delete("/delete-resume", AuthUser, deleteUserResume);
 
 export { userRouter }

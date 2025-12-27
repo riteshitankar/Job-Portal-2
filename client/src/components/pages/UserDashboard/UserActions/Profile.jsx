@@ -170,11 +170,11 @@ const Profile = () => {
             onClick={() => setTriggerCoverChange(true)}
             className="absolute bottom-3 right-3 bg-black bg-opacity-60 text-white px-3 py-1 rounded flex items-center gap-2"
           >
-            <FaCamera /> 
+            <FaCamera />
           </button>
         </div>
         {/* ================= PROFILE INFO ================= */}
-        <div className='information' style={{backgroundColor:'rgba(74, 112, 169, 0.9)'}}>
+        <div className='information' style={{ backgroundColor: 'rgba(74, 112, 169, 0.9)' }}>
           <div className='pnpa'>
             <div className='profile-picture'>
               {
@@ -194,8 +194,8 @@ const Profile = () => {
 
                       <button
                         onClick={() => setTriggerProfilePictureChange(true)}
-                        className='bg-primary px-2 py-1 bg-white rounded hover:bg-yellow-800 z-10' 
-                        style={{cursor: 'pointer', display: showPasswordReset || showBioPopup || TriggerResumeSection ? 'none' : 'block' }}
+                        className='bg-primary px-2 py-1 bg-white rounded hover:bg-yellow-800 z-10'
+                        style={{ cursor: 'pointer', display: showPasswordReset || showBioPopup || TriggerResumeSection ? 'none' : 'block' }}
                       >
                         <FaCamera />
                       </button>
@@ -598,23 +598,24 @@ const Profile = () => {
             </button>
 
             <h3 className='text-2xl  text-center '>
-              {user.resume ? "Modify the existing resume" : "Upload a resume"}
+              {user.resume?.url? "Modify the existing resume" : "Upload a resume"}
             </h3>
 
-            {user.resume ? (
+            {user?.resume?.url? (
               <div className=' text-center'>
                 <div className='text-lg'>
-                  Current Resume: <strong>{user.resume}</strong>
+                  Current Resume: <strong>{user.resume.url}</strong>
                 </div>
                 <br />
                 <div className='flex flex-col gap-4'>
                   <a
-                    href={`${import.meta.env.VITE_BASE_API_URL}/uploads/resumes/${user.resume}`}
+                    href={user.resume.url}
                     target="_blank"
                     className='bg-yellow-500 text-dark py-1 px-2 rounded font-bold hover:bg-yellow-600 cursor-pointer block'
                   >
                     Preview or Download
                   </a>
+                  
                   <label className='bg-blue-500 text-white py-1 px-2 rounded font-bold hover:bg-blue-600 cursor-pointer block text-center'>
                     Update
                     <input
@@ -654,6 +655,8 @@ const Profile = () => {
                   >
                     Delete
                   </button>
+                  
+
                 </div>
               </div>
             ) : (
