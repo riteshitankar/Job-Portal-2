@@ -27,6 +27,8 @@ const Profile = () => {
   let navigate = useNavigate();
 
   const [acceptedCount, setAcceptedCount] = useState(0);
+  const [showResumePreview, setShowResumePreview] = useState(false);
+
 
   /* ---------------- COVER PHOTO STATES ---------------- */
   const [triggerCoverChange, setTriggerCoverChange] = useState(false);
@@ -154,9 +156,17 @@ const Profile = () => {
         <div className="relative h-52 w-full overflow-hidden rounded-t-xl">
           {user.cover_photo ? (
             <img
-              src={`${import.meta.env.VITE_BASE_API_URL}/uploads/user_cover_photos/${user.cover_photo}`}
+              src={
+                user.cover_photo?.url
+                  ? `${import.meta.env.VITE_BASE_API_URL}/${user.cover_photo.url}`
+                  : user.cover_photo
+                    ? `${import.meta.env.VITE_BASE_API_URL}/uploads/user_cover_photos/${user.cover_photo}`
+                    : ""
+              }
               className="w-full h-full object-cover"
             />
+
+
           ) : (
             <div
               className="w-full h-full flex items-center justify-center text-gray-600"
@@ -283,18 +293,7 @@ const Profile = () => {
                   <span>{user.logedIn ? user.phone : null}</span>
                 </div>
               </div>
-              <div className="flex gap-3 p-3 shadow">
-                <div className="flex items-center gap-3">
-                  <span className="user-info-icon">
-                    <IoColorPaletteSharp />
-                  </span>
-                  <span>Choose a cover color : </span>
-                  <span>
-                    <input type="color" onChange={(e) => setColor(e.target.value)} className='h-10 w-10' />
-
-                  </span>
-                </div>
-              </div>
+              
 
               <div className='flex gap-3 p-3 shadow '>
                 <div className='flex items-start gap-3 justify-between'>
@@ -598,24 +597,27 @@ const Profile = () => {
             </button>
 
             <h3 className='text-2xl  text-center '>
-              {user.resume?.url? "Modify the existing resume" : "Upload a resume"}
+              {user.resume?.url ? "Modify the existing resume" : "Upload a resume"}
             </h3>
 
-            {user?.resume?.url? (
+            {user?.resume?.url ? (
               <div className=' text-center'>
-                <div className='text-lg'>
-                  Current Resume: <strong>{user.resume.url}</strong>
+                <div className="text-lg">
+                  Current Resume:
+                  <button
+                    type="button"
+                    onClick={() => setShowResumePreview(true)}
+                    className="ml-2 text-blue-600 underline break-all"
+                  >
+                    {user.resume.url.split("/").pop()}
+                  </button>
                 </div>
+
                 <br />
                 <div className='flex flex-col gap-4'>
-                  <a
-                    href={user.resume.url}
-                    target="_blank"
-                    className='bg-yellow-500 text-dark py-1 px-2 rounded font-bold hover:bg-yellow-600 cursor-pointer block'
-                  >
-                    Preview or Download
-                  </a>
-                  
+
+
+
                   <label className='bg-blue-500 text-white py-1 px-2 rounded font-bold hover:bg-blue-600 cursor-pointer block text-center'>
                     Update
                     <input
@@ -655,7 +657,10 @@ const Profile = () => {
                   >
                     Delete
                   </button>
-                  
+
+
+
+
 
                 </div>
               </div>
@@ -689,6 +694,41 @@ const Profile = () => {
           </div>
         </div>
       )}
+
+
+      {showResumePreview && (
+        <div className="fixed inset-0 bg-black/80 z-[9999]">
+
+          {/* TOP BAR */}
+          <div className="flex items-center justify-between px-4 py-3 bg-black text-white">
+            <span className="font-semibold">
+              Resume Preview
+            </span>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowResumePreview(false)}
+                className="bg-red-600 px-3 py-1 rounded text-sm"
+              >
+                ✕ Close
+              </button>
+            </div>
+          </div>
+
+          {/* PDF VIEWER */}
+          <iframe
+            src={`https://docs.google.com/gview?url=${encodeURIComponent(
+              `${import.meta.env.VITE_BASE_API_URL}/${user.resume.url}`
+            )}&embedded=true`}
+            className="w-full h-[calc(100vh-56px)] bg-white"
+            frameBorder="0"
+            title="Resume Preview"
+          />
+
+
+        </div>
+      )}
+
 
 
     </>
