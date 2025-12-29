@@ -21,8 +21,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions))
 // routers
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
-// app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static("uploads"));
 app.use("/user", userRouter);
 app.use("/company", companyRouter);
 app.use("/job", jobRouter);

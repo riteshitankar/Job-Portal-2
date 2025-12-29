@@ -293,7 +293,7 @@ const Profile = () => {
                   <span>{user.logedIn ? user.phone : null}</span>
                 </div>
               </div>
-              
+
 
               <div className='flex gap-3 p-3 shadow '>
                 <div className='flex items-start gap-3 justify-between'>
@@ -658,6 +658,16 @@ const Profile = () => {
                     Delete
                   </button>
 
+                  <a
+                    href={user.resume.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-green-600 text-white py-1 px-3 rounded font-bold hover:bg-green-700"
+                  >
+                    Download Resume
+                  </a>
+
+
 
 
 
@@ -696,38 +706,24 @@ const Profile = () => {
       )}
 
 
+
+
       {showResumePreview && (
         <div className="fixed inset-0 bg-black/80 z-[9999]">
-
-          {/* TOP BAR */}
-          <div className="flex items-center justify-between px-4 py-3 bg-black text-white">
-            <span className="font-semibold">
-              Resume Preview
-            </span>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowResumePreview(false)}
-                className="bg-red-600 px-3 py-1 rounded text-sm"
-              >
-                ✕ Close
-              </button>
-            </div>
+          <div className="flex justify-between px-4 py-3 bg-black text-white">
+            <span>Resume Preview</span>
+            <button onClick={() => setShowResumePreview(false)}>✕</button>
           </div>
 
-          {/* PDF VIEWER */}
           <iframe
-            src={`https://docs.google.com/gview?url=${encodeURIComponent(
-              `${import.meta.env.VITE_BASE_API_URL}/${user.resume.url}`
-            )}&embedded=true`}
+            src={user.resume.url}
             className="w-full h-[calc(100vh-56px)] bg-white"
-            frameBorder="0"
             title="Resume Preview"
           />
-
-
         </div>
       )}
+
+
 
 
 
