@@ -54,6 +54,7 @@ const App = () => {
 
 
                 <Route path="/user/dashboard/tracker" element={<JobTracker />} />
+                {/* <Route path="/job/:jobId" element={<JobDetailsPage />} /> */}
 
 
               </Routes>

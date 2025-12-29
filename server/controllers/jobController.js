@@ -1,6 +1,8 @@
 import { companyModel } from "../models/companySchema.js";
 import { jobModel } from "../models/jobSchema.js";
 import { userModel } from "../models/userSchema.js";
+import { sendJobNotificationEmail } from "../utils/sendJobNotificationEmail.js";
+
 
 const createJob = async (req, res) => {
   try {
@@ -29,6 +31,23 @@ const createJob = async (req, res) => {
     });
 
     const result = await newJob.save();
+
+/* ================= EMAIL NOTIFICATION ================= */
+setImmediate(async () => {
+  try {
+    const users = await userModel.find(
+      { "email.verified": true },
+      "email.userEmail"
+    );
+
+    const emails = users.map(u => u.email.userEmail);
+
+    await sendJobNotificationEmail(emails, result);
+  } catch (err) {
+    console.log("Job email notification failed:", err);
+  }
+});
+
 
     await companyModel.findByIdAndUpdate(company._id, {
       $push: { createJobs: result._id },
