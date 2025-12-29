@@ -21,7 +21,7 @@ export const sendJobNotificationEmail = async (emails, job) => {
     const mailOptions = {
         from: process.env.USER_EMAIL,
         bcc: emails,
-        subject: `🚀 New Job Posted: ${job.title}`,
+        subject: `New job posted for ${job.title} role ...`,
         html: `
   <div style="background-color:#f4f6f8;padding:30px 0;font-family:Arial,Helvetica,sans-serif;">
     <table align="center" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
@@ -30,7 +30,7 @@ export const sendJobNotificationEmail = async (emails, job) => {
       <tr>
         <td style="background:#2563eb;padding:20px;text-align:center;">
           <h1 style="color:#ffffff;margin:0;font-size:22px;">
-            🚀 New Job Opportunity
+            New Job Opportunity
           </h1>
         </td>
       </tr>

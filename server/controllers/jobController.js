@@ -2,6 +2,7 @@ import { companyModel } from "../models/companySchema.js";
 import { jobModel } from "../models/jobSchema.js";
 import { userModel } from "../models/userSchema.js";
 import { sendJobNotificationEmail } from "../utils/sendJobNotificationEmail.js";
+import { sendApplicationStatusEmail } from "../utils/applicationStatusEmail.js";
 
 
 const createJob = async (req, res) => {
@@ -60,6 +61,57 @@ setImmediate(async () => {
     res.status(500).json({ message: "Unable to create job", err });
   }
 };
+
+
+const updateApplicantStatus = async (req, res) => {
+  try {
+    const { userId, applicantStatus } = req.body;
+    const { jobId } = req.params;
+
+    if (!["accepted", "rejected"].includes(applicantStatus)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const job = await jobModel
+      .findById(jobId)
+      .populate("jobCreatedBy", "companyDetails companyName");
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    // update applicant status
+    job.applicantStatus[userId] = applicantStatus;
+    await job.save();
+
+    // get user
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // 📧 SEND EMAIL
+    await sendApplicationStatusEmail({
+      to: user.email.userEmail,
+      userName: user.name,
+      jobTitle: job.title,
+      companyName:
+        job.jobCreatedBy?.companyDetails?.companyName || "Company",
+      status: applicantStatus,
+    });
+
+    res.status(200).json({
+      message: "Applicant status updated and email sent",
+      status: applicantStatus,
+    });
+
+  } catch (err) {
+    console.error("Update applicant status error:", err);
+    res.status(500).json({ message: "Server error", err });
+  }
+};
+
+
 
 
 const handleJobAction = async (req, res) => {
@@ -204,25 +256,25 @@ const getApplicants = async (req, res) => {
   }
 };
 
-const updateApplicantStatus = async (req, res) => {
-  try {
-    const { jobId } = req.params;
-    const { userId, status } = req.body; // accepted or rejected
+// const updateApplicantStatus = async (req, res) => {
+//   try {
+//     const { jobId } = req.params;
+//     const { userId, status } = req.body; // accepted or rejected
 
-    if (!["accepted", "rejected"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status" });
-    }
+//     if (!["accepted", "rejected"].includes(status)) {
+//       return res.status(400).json({ message: "Invalid status" });
+//     }
 
-    await jobModel.findByIdAndUpdate(
-      jobId,
-      { $set: { [`applicantStatus.${userId}`]: status } }
-    );
+//     await jobModel.findByIdAndUpdate(
+//       jobId,
+//       { $set: { [`applicantStatus.${userId}`]: status } }
+//     );
 
-    res.status(200).json({ message: "Status updated", status });
-  } catch (err) {
-    res.status(500).json({ message: "Failed to update status" });
-  }
-};
+//     res.status(200).json({ message: "Status updated", status });
+//   } catch (err) {
+//     res.status(500).json({ message: "Failed to update status" });
+//   }
+// };
 
 
 

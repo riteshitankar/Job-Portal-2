@@ -41,7 +41,7 @@ const CompanyApplicantsPage = () => {
     try {
       await axios.put(
         `http://localhost:5000/job/applicants/${jobId}/update`,
-        { userId, status },
+        { userId, applicantStatus: status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
