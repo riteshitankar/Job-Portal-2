@@ -349,25 +349,7 @@ const Profile = () => {
 
 
 
-            {/* reset password button and resume upload button  */}
-            <div className='p-3 flex gap-4'>
-              <button
-                onClick={() => {
-                  setShowPasswordReset(true);
-                  setResetStep(1);
-                }}
-                className="bg-primary text-light px-4 py-2 rounded bg-blue-500 hover:bg-blue-700 font-medium cursor-pointer"
-              >
-                Change Password
-              </button>
-
-              <button
-                onClick={() => setTriggerResumeSection(true)}
-                className='bg-primary text-light px-4 py-2 rounded bg-blue-500 hover:bg-blue-700 font-medium cursor-pointer'
-              >
-                Resume
-              </button>
-            </div>
+            
           </div>
 
           <div className='reports p-3'>
@@ -384,8 +366,26 @@ const Profile = () => {
 
               <span className='font-bold'>Profile Selected</span>
             </div>
+            {/* reset password button and resume upload button  */}
+            <div className='p-3 flex gap-4'>
+              <button
+                onClick={() => {
+                  setShowPasswordReset(true);
+                  setResetStep(1);
+                }}
+                className="bg-primary hover:text-white px-4 py-2 rounded bg-blue-500 hover:bg-blue-700 font-medium cursor-pointer border rounded-2xl"
+              >
+                Change Password
+              </button>
+
+              <button
+                onClick={() => setTriggerResumeSection(true)}
+                className='bg-primary hover:text-white px-4 py-2 rounded bg-blue-500 hover:bg-blue-700 font-medium cursor-pointer border rounded-2xl'
+              >
+                Resume
+              </button>
+            </div>
           </div>
-          <div className='documents'></div>
         </div>
       </div>
       {/* ================= COVER UPLOAD MODAL ================= */}
