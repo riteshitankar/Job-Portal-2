@@ -131,17 +131,22 @@ const CompanyProfile = () => {
           <div
             {...getRootProps()}
             className={`border-2 border-dashed rounded-xl p-6 cursor-pointer transition
-              ${isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"}
-            `}
+    ${isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"}
+  `}
           >
             <input {...getInputProps()} />
-            {logoPreview || company.companyLogo ? (
+
+            {logoPreview ? (
               <img
-                src={
-                  logoPreview ||
-                  `${import.meta.env.VITE_BASE_API_URL}/uploads/company_logos/${company.companyLogo}`
-                }
+                src={logoPreview}
                 className="w-40 h-40 object-cover mx-auto rounded-lg"
+                alt="Logo preview"
+              />
+            ) : company.companyLogo ? (
+              <img
+                src={company.companyLogo}
+                className="w-40 h-40 object-cover mx-auto rounded-lg"
+                alt="Company logo"
               />
             ) : (
               <p className="text-gray-500">
@@ -149,6 +154,7 @@ const CompanyProfile = () => {
               </p>
             )}
           </div>
+
 
           {selectedLogo && (
             <button

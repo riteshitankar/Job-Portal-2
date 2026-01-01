@@ -1,23 +1,16 @@
 import multer from "multer";
-import path from "path";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "../config/cloudinary.js";
 
-const logoStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/company_logos/");
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "job_portal/companyLogo",
+    allowed_formats: ["jpg", "png", "jpeg", "webp"],
+    transformation: [{ width: 500, height: 500, crop: "limit" }],
   },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
-    cb(null, "company_logo_" + uniqueSuffix + path.extname(file.originalname));
-  }
 });
 
-const companyLogoUpload = multer({
-  storage: logoStorage,
-  fileFilter: (req, file, cb) => {
-    const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-    if (allowed.includes(file.mimetype)) cb(null, true);
-    else cb(new Error("Only JPG, PNG, WEBP images allowed!"));
-  }
-}).single("file");
+const profilePicUpload = multer({ storage }).single("file");
 
-export default companyLogoUpload;
+export default profilePicUpload;

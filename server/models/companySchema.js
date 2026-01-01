@@ -55,8 +55,8 @@ let companySchema = mongoose.Schema({
         required: true
     },
     companyLogo: {
-        type: String,
-        required: false
+        url: String,
+        public_id: String
     },
     documents: {
         type: Array,

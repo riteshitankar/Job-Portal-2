@@ -154,19 +154,12 @@ const Profile = () => {
       <div id="user-profile" className="shadow">
         {/* ================= COVER PHOTO ================= */}
         <div className="relative h-52 w-full overflow-hidden rounded-t-xl">
-          {user.cover_photo ? (
+          {user.cover_photo?.url ? (
             <img
-              src={
-                user.cover_photo?.url
-                  ? `${import.meta.env.VITE_BASE_API_URL}/${user.cover_photo.url}`
-                  : user.cover_photo
-                    ? `${import.meta.env.VITE_BASE_API_URL}/uploads/user_cover_photos/${user.cover_photo}`
-                    : ""
-              }
+              src={user.cover_photo.url}
               className="w-full h-full object-cover"
+              alt="Cover Photo"
             />
-
-
           ) : (
             <div
               className="w-full h-full flex items-center justify-center text-gray-600"
@@ -175,6 +168,7 @@ const Profile = () => {
               No Cover Photo
             </div>
           )}
+
 
           <button
             onClick={() => setTriggerCoverChange(true)}
@@ -349,7 +343,7 @@ const Profile = () => {
 
 
 
-            
+
           </div>
 
           <div className='reports p-3'>
@@ -597,10 +591,10 @@ const Profile = () => {
             </button>
 
             <h3 className='text-2xl  text-center '>
-              {user.resume?.url ? "Modify the existing resume" : "Upload a resume"}
+              {user.resume ? "Modify the existing resume" : "Upload a resume"}
             </h3>
 
-            {user?.resume?.url ? (
+            {user?.resume ? (
               <div className=' text-center'>
                 <div className="text-lg">
                   Current Resume:
@@ -609,7 +603,7 @@ const Profile = () => {
                     onClick={() => setShowResumePreview(true)}
                     className="ml-2 text-blue-600 underline break-all"
                   >
-                    {user.resume.url.split("/").pop()}
+                    {user.resume?.url?.split("/").pop()}
                   </button>
                 </div>
 
@@ -667,6 +661,17 @@ const Profile = () => {
                     Download Resume
                   </a>
 
+                  {user.resume?.url && (
+                    <a
+                      href={user.resume.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-green-600 text-white py-1 px-3 rounded font-bold hover:bg-green-700"
+                    >
+                      Download Resume
+                    </a>
+                  )}
+
 
 
 
@@ -705,23 +710,68 @@ const Profile = () => {
         </div>
       )}
 
-
-
-
+      {/* show resume preview  */}
       {showResumePreview && (
         <div className="fixed inset-0 bg-black/80 z-[9999]">
-          <div className="flex justify-between px-4 py-3 bg-black text-white">
-            <span>Resume Preview</span>
-            <button onClick={() => setShowResumePreview(false)}>✕</button>
+
+          {/* TOP BAR */}
+          <div className="flex items-center justify-between px-4 py-3 bg-black text-white">
+            <span className="font-semibold">
+              Resume Preview
+            </span>
+
+            <div className="flex gap-3">
+
+              {/* CLOSE */}
+              <button
+                onClick={() => setShowResumePreview(false)}
+                className="bg-red-600 px-3 py-1 rounded text-sm"
+              >
+                ✕ Close
+              </button>
+            </div>
           </div>
 
+          {/* PDF VIEWER */}
           <iframe
-            src={user.resume.url}
+            src={`https://docs.google.com/gview?url=${encodeURIComponent(
+              user.resume.url
+            )}&embedded=true`}
             className="w-full h-[calc(100vh-56px)] bg-white"
+            frameBorder="0"
             title="Resume Preview"
           />
         </div>
       )}
+
+      {/* User Resume Section */}
+      <ul className="mt-3">
+        {user?.resume ? (
+          <li className="flex items-center gap-4">
+            {/* VIEW (Google Viewer) */}
+            <button
+              type="button"
+              onClick={() => setShowResumePreview(true)}
+              className="text-blue-600 underline break-all"
+            >
+              View Resume
+            </button>
+
+            {/* DELETE */}
+            {/* <button
+              type="button"
+              className="text-red-500 font-medium hover:underline"
+              onClick={handleDeleteResume}
+            >
+              Delete
+            </button> */}
+          </li>
+        ) : (
+          <li className="text-gray-500">No resume uploaded</li>
+        )}
+      </ul>
+
+
 
 
 
