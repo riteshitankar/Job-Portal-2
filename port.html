@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parag Bobhate | Project Manager | Widesoftech</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- AOS Animation -->
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <style>
+    /* =========================
+   GLOBAL THEME VARIABLES
+========================= */
+    :root {
+      --primary: #2563eb;
+      /* Royal Blue */
+      --secondary: #0ea5e9;
+      /* Cyan */
+      --accent: #a5b4fc;
+      /* Lavender */
+      --glass-bg: rgba(255, 255, 255, 0.25);
+      --glass-border: rgba(255, 255, 255, 0.4);
+      --light-bg: #f1f5f9;
+      --dark-text: #1e293b;
+    }
+
+    /* =========================
+   RESET & BASE
+========================= */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Times New Roman", Times, serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #e0f2fe, var(--light-bg));
+      color: var(--dark-text);
+      line-height: 1.8;
+    }
+
+    /* =========================
+   HERO SECTION
+========================= */
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding: 90px 10%;
+      color: #fff;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .hero h1 {
+      font-size: 52px;
+      font-weight: bold;
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+    }
+
+    .hero h3 {
+      font-weight: normal;
+      margin-top: 10px;
+    }
+
+    .hero p {
+      font-size: 19px;
+      margin-top: 20px;
+    }
+
+    /* =========================
+   GLASS CARD (Reusable)
+========================= */
+    .hero-card,
+    .about-box,
+    .service-card,
+    .contact-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 22px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.15);
+    }
+
+    /* HERO GLASS */
+    .hero-card {
+      padding: 32px;
+    }
+
+    .hero-card p {
+      margin: 12px 0;
+    }
+
+    /* =========================
+   SECTIONS
+========================= */
+    section {
+      padding: 85px 10%;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 65px;
+    }
+
+    .section-title h2 {
+      font-size: 38px;
+      color: var(--primary);
+    }
+
+    .section-title p {
+      color: #475569;
+      font-size: 18px;
+    }
+
+    /* =========================
+   ABOUT
+========================= */
+    .about {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .about-box {
+      padding: 40px;
+    }
+
+    .about-box h3 {
+      margin-bottom: 15px;
+      color: var(--primary);
+    }
+
+    .about-box ul li {
+      margin: 10px 0;
+    }
+
+    /* =========================
+   SERVICES
+========================= */
+    .services {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 30px;
+    }
+
+    .service-card {
+      padding: 40px;
+      text-align: center;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .service-card:hover {
+      transform: translateY(-14px);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    .service-card i {
+      font-size: 44px;
+      color: var(--secondary);
+      margin-bottom: 18px;
+    }
+
+    /* =========================
+   INTERNSHIP HIGHLIGHT
+========================= */
+    .highlight {
+      background: linear-gradient(135deg, var(--secondary), var(--primary));
+      color: #fff;
+      padding: 65px;
+      border-radius: 35px;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.25);
+    }
+
+    .highlight ul li {
+      margin: 12px 0;
+      font-size: 18px;
+    }
+
+    /* =========================
+   CONTACT
+========================= */
+    .contact {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 30px;
+    }
+
+    .contact-card {
+      padding: 35px;
+    }
+
+    .contact-card p {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 15px 0;
+    }
+
+    .contact-card i {
+      color: var(--primary);
+      font-size: 20px;
+    }
+
+    /* Clickable links */
+    .contact-card a {
+      text-decoration: none;
+      color: inherit;
+      transition: color 0.3s ease;
+    }
+
+    .contact-card a:hover {
+      color: var(--secondary);
+      text-decoration: underline;
+    }
+
+    /* =========================
+   FOOTER
+========================= */
+    footer {
+      background: #020617;
+      color: #cbd5e1;
+      text-align: center;
+      padding: 30px;
+      font-size: 15px;
+    }
+
+    /* =========================
+   RESPONSIVE
+========================= */
+    @media (max-width: 900px) {
+
+      .hero,
+      .about {
+        grid-template-columns: 1fr;
+      }
+
+      header,
+      section {
+        padding: 60px 7%;
+      }
+
+      .hero h1 {
+        font-size: 42px;
+      }
+    }
+
+    .glass-title {
+      display: inline-block;
+      font-size: 21px;
+      padding: 12px 26px;
+      margin-top: 12px;
+      border-radius: 14px;
+
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+
+      color: #ffffff;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .glass-title {
+      background: linear-gradient(135deg, rgb(94 32 32 / 28%), rgba(255, 255, 255, 0.15));
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HERO -->
+  <header data-aos="fade-down">
+    <div class="hero">
+      <div>
+        <h1>Parag <span>Bobhate</span></h1>
+        <p style="font-size: 21px;" class="glass-title">Project Manager Widesoftech Pvt Ltd</p>
+        <p>
+          Delivering enterprise-grade software solutions, managing high-impact projects,
+          and guiding students through internships and placements.
+        </p>
+      </div>
+
+      <div class="hero-card" data-aos="fade-left">
+        <h3>Quick Info</h3>
+        <p><i class="fas fa-phone"></i> 9307370023</p>
+        <p><i class="fas fa-envelope"></i> nanop16@gmail.com</p>
+        <p><i class="fas fa-globe"></i> www.widesoftech.com</p>
+        <p><i class="fas fa-map-marker-alt"></i> Nagpur, Maharashtra</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ABOUT -->
+  <section>
+    <div class="section-title" data-aos="fade-up">
+      <h2>About Me</h2>
+      <p>Leadership with technical excellence</p>
+    </div>
+
+    <div class="about">
+      <div class="about-box" data-aos="zoom-in">
+        <h4>Who I Am</h4>
+        <p>
+          Project Manager at <b>Widesoftech Pvt Ltd</b> specializing in enterprise solutions,
+          digital transformation, and team leadership.
+        </p>
+      </div>
+
+      <div class="about-box" data-aos="zoom-in">
+        <h3>What I Do</h3>
+        <ul type='none'>
+          <li>✔ Project Planning & Delivery</li>
+          <li>✔ Client Coordination</li>
+          <li>✔ Team Mentoring</li>
+          <li>✔ Internship & Placement Programs</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section>
+    <div class="section-title" data-aos="fade-up">
+      <h2>Our Services</h2>
+      <p>Technology-driven solutions</p>
+    </div>
+
+    <div class="services">
+      <div class="service-card" data-aos="flip-left">
+        <i class="fas fa-laptop-code"></i>
+        <h4>Web Development</h4>
+        <p>Modern & scalable web platforms</p>
+      </div>
+
+      <div class="service-card" data-aos="flip-left">
+        <i class="fas fa-mobile-alt"></i>
+        <h4>App Development</h4>
+        <p>Android & iOS applications</p>
+      </div>
+
+      <div class="service-card" data-aos="flip-left">
+        <i class="fas fa-cloud"></i>
+        <h4>Software Solutions</h4>
+        <p>Custom enterprise-grade software</p>
+      </div>
+
+      <div class="service-card" data-aos="flip-left">
+        <i class="fas fa-graduation-cap"></i>
+        <h4>Internship & Placement</h4>
+        <p>Live projects with certification</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERNSHIP -->
+  <section>
+    <div class="highlight" data-aos="zoom-in-up">
+      <h2>Internship & Placement Available</h2>
+      <ul type="none">
+        <li>✔ All IT Domains</li>
+        <li>✔ Live Industry Projects</li>
+        <li>✔ Placement Assistance</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section>
+    <div class="section-title" data-aos="fade-up">
+      <h2>Contact Me</h2>
+      <p>Let’s build something impactful</p>
+    </div>
+
+    <div class="contact">
+      <div class="contact-card" data-aos="fade-right">
+
+        <p>
+          <i class="fas fa-phone"></i>
+          <a href="tel:+919307370023">+91 93073 70023</a>
+        </p>
+
+        <p>
+          <i class="fas fa-envelope"></i>
+          <a href="mailto:nanop16@gmail.com">nanop16@gmail.com</a>
+        </p>
+
+        <p>
+          <i class="fas fa-globe"></i>
+          <a href="https://widesoftech.com" target="_blank" rel="noopener">
+            Website
+          </a>
+        </p>
+        <p>
+          <i class="fa-brands fa-facebook-f"></i>
+          <a href="https://www.facebook.com/Widesoftech/" target="_blank" rel="noopener">
+            Facebook
+          </a>
+        </p>
+        <p>
+          <i class="fa-brands fa-instagram"></i>
+          <a href="https://www.instagram.com/widesoftech/" target="_blank" rel="noopener">
+            Instagram
+          </a>
+        </p>
+        <p>
+          <i class="fa-brands fa-linkedin"></i>
+          <a href="https://www.linkedin.com/company/widesoftech-pvt-ltd/" target="_blank" rel="noopener">
+            LinkedIn
+          </a>
+        </p>
+
+        
+      </div>
+
+      <div class="contact-card" data-aos="fade-left">
+        <p>
+          <i class="fas fa-map-marker-alt"></i>
+          <a href="https://maps.app.goo.gl/G7bxsXgs3VCpMsjLA" target="_blank" rel="noopener">
+            8A, Hanuman Nagar, Medical Chowk, near Bata showroom, Krida Chowk, road, Nagpur, Maharashtra 440024
+          </a>
+        </p>
+      </div>
+    </div>
+
+  </section>
+
+  <footer>
+    <p>© 2025 Widesoftech Pvt Ltd | Designed by <a href="https://www.linkedin.com/in/riteshitankar/"
+        target="_blank">@riteshitankar</a> </p>
+  </footer>
+
+  <!-- AOS JS -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 900,
+      once: true,
+      easing: 'ease-in-out'
+    });
+  </script>
+
+</body>
+
+</html>
+
+
+<!-- nfc.vc/5969VC -->

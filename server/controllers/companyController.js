@@ -204,42 +204,34 @@ const handleCompanyOTPForPasswordReset = async (req, res) => {
 const handleCompanyFileUpload = async (req, res) => {
   try {
     if (!req.file) throw new Error("Failed to upload a file!");
-    const fileName = req.file.filename;
-    const fileType = req.params.file_type; // 'document' or 'company_logo'
+
+    const fileType = req.params.file_type;
+    const fileUrl = req.file.path; // cloudinary URL
 
     let updateField = {};
-    if (fileType === "document") {
-      updateField = { $push: { documents: fileName } };
-    } else if (fileType === "company_logo") {
-      updateField = { $set: { companyLogo: fileName } };
+
+    if (fileType === "company_logo") {
+      updateField = { $set: { companyLogo: fileUrl } };
+    } else if (fileType === "document") {
+      updateField = { $push: { documents: fileUrl } };
     } else {
-      throw new Error("Invalid file type. Only 'document' or 'company_logo' allowed.");
+      throw new Error("Invalid file type");
     }
 
-    const result = await companyModel.updateOne(
-      { "email.userEmail": req.company.email.userEmail },
+    await companyModel.updateOne(
+      { _id: req.company._id },
       updateField
     );
 
-    if (result.modifiedCount === 0) {
-      throw new Error("Company not found or file not saved.");
-    }
-
-    const uploadDest = `uploads/${fileType === "document" ? "company_documents" : "company_logos"}/${fileName}`;
-
     res.status(202).json({
-      message: `${fileType === "document" ? "Document" : "Company logo"} uploaded successfully!`,
-      fileName,
-      uploadDest,
+      message: "Upload successful",
+      fileUrl,
     });
   } catch (err) {
-    console.error("Error in handleCompanyFileUpload:", err);
-    res.status(500).json({
-      message: "Failed to upload the file.",
-      error: err.message || err,
-    });
+    res.status(500).json({ message: "Upload failed", err });
   }
 };
+
 
 const uploadCompanyDocument = async (req, res) => {
   try {

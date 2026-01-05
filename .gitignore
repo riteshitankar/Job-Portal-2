@@ -1,9 +1,17 @@
 supporting_files
+port.html
 
 # client 
 client/node_modules
+<<<<<<< HEAD
 
 
 # server 
 server/node_modules
 server/package-lock.json
+=======
+
+# server 
+server/node_modules
+server/package-lock.json
+>>>>>>> 5d9f407e80268aa0c44f9f0246cf9b471d922b75
