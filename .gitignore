@@ -1,10 +1,9 @@
 supporting_files
+port.html
 
 # client 
 client/node_modules
-client/.env
 
 # server 
 server/node_modules
 server/package-lock.json
-server/config.env

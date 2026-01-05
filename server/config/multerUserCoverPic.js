@@ -1,23 +1,16 @@
 import multer from "multer";
-import path from "path";
+import CloudinaryStorage from "multer-storage-cloudinary";
+import cloudinary from "../config/cloudinary.js";
 
-const coverStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/user_cover_photos/");
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, "user_cover_" + uniqueSuffix + path.extname(file.originalname));
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "job_portal/user_cover_photos",
+    allowed_formats: ["jpg", "png", "jpeg", "webp"],
+    transformation: [{ width: 1200, height: 400, crop: "limit" }],
   },
 });
 
-const userCoverPicUpload = multer({
-  storage: coverStorage,
-  fileFilter: (req, file, cb) => {
-    const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-    if (allowed.includes(file.mimetype)) cb(null, true);
-    else cb(new Error("Only JPG, PNG, WEBP images allowed"));
-  },
-}).single("file");
+const uploadUserCoverPhoto = multer({ storage }).single("file");
 
-export default userCoverPicUpload;
+export default uploadUserCoverPhoto;
