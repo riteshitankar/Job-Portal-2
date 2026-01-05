@@ -50,7 +50,7 @@ export const requestUserProfile = async (token) => {
 export const userProfilePicture = async (token, formData) => {
     try {
         const result = await axios.post(
-            `${baseUrl}/upload-file/profile_picture`,
+            `${baseUrl}/upload-file/:profile_picture`,
             formData,
             {
                 headers: {

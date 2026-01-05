@@ -111,12 +111,18 @@ const Profile = () => {
     fd.append("file", selectedImage);
 
     try {
-      await userProfilePicture(localStorage.getItem("token"), fd);
-      triggerMessage("success", "Profile picture uploaded!");
-      setTriggerProfilePictureChange(false);
-      setPreviewUrl(null);
-      setSelectedImage(null);
-      fetchUserProfile();
+            let token = localStorage.getItem("token");
+
+            let result = await userProfilePicture(token, formData);
+
+            console.log(result)
+
+            setTriggerProfilePictureChange(false)
+            triggerMessage("success", "Profile picture uploaded!");
+            // window.redirect("/")
+            fetchUserProfile()
+            setPreviewUrl(null)
+            setSelectedImage(null)
     } catch {
       triggerMessage("danger", "Upload failed");
     }

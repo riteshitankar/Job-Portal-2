@@ -2,7 +2,7 @@ import express from "express"
 import path from 'path'
 import dotenv from "dotenv"
 import cors from "cors"
-import "./database/conn.js"
+import connectDB from "./database/conn.js"
 import { userRouter } from "./routers/userRouter.js"
 import { companyRouter } from "./routers/companyRouter.js";
 import { jobRouter } from "./routers/jobRouter.js"; // add at top with other routers
@@ -32,6 +32,22 @@ app.use((req, res) => {
   console.log("user trying to access invalid route !")
   res.status(404).json({ message: "content/route not found !" })
 })
-app.listen(port, () => {
-  console.log(`server is running on port ${port} !`)
-})
+// app.listen(port, () => {
+//   console.log(`server is running on port ${port} !`)
+// })
+
+
+const startServer = async () => {
+  try {
+    await connectDB(); // 🔑 DB FIRST
+
+    app.listen(port, () => {
+      console.log(`🚀 Server running on port ${port}`);
+    });
+  } catch (err) {
+    console.error("❌ Server failed to start:", err.message);
+    process.exit(1);
+  }
+};
+
+startServer();
