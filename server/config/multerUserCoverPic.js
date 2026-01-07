@@ -1,8 +1,9 @@
 import multer from "multer";
-import CloudinaryStorage from "multer-storage-cloudinary";
-import cloudinary from "../config/cloudinary.js";
+// import CloudinaryStorage from "multer-storage-cloudinary";
+import {CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "./cloudinary.js";
 
-const storage = new CloudinaryStorage({
+const coverStorage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "job_portal/user_cover_photos",
@@ -11,6 +12,6 @@ const storage = new CloudinaryStorage({
   },
 });
 
-const uploadUserCoverPhoto = multer({ storage }).single("file");
+const uploadUserCoverPhoto = multer({ coverStorage }).single("file");
 
 export default uploadUserCoverPhoto;
